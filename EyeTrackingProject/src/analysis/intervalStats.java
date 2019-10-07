@@ -48,9 +48,9 @@ public class intervalStats {
                 + " %-20s %-16s %-12s   %-16s  %-9s   %-15s %-15s %-15s %-15s %-15s %-11s   %-16s %-13s %-12s %-12s %-12s %-11s   %-9s";
         bufferedWriter.write(String.format(formatFieldNames, "minutes", "total fixation duration", "sum fixation duration", "mean fixation duration"
                 ,"median fixation duration", "SD fixation duration", "min fixation duration", "max fixation duration"
-                , "scd", "sum saccadeLength", "mean saccade length", "median saccade length", "SD saccade length", "min saccade length", "max saccade length"
+                , "total saccades", "sum saccade length", "mean saccade length", "median saccade length", "SD saccade length", "min saccade length", "max saccade length"
                 , "sum saccade duration", "mean saccade duration", "median saccade duration", "SD saccade duration", "min saccade duration", "max saccade duration"
-                , "scanpath", "fxation to saccade", "sum abs degree", " mean abs degree", " med abs degree", "SD abs degree", "min abs degree", "max abs degree"
+                , "scanpath", "fixation to saccade", "sum abs degree", " mean abs degree", " med abs degree", "SD abs degree", "min abs degree", "max abs degree"
                 , "sum rel degree", " mean rel degree", " median rel degree", "SD rel degree", "min rel degree", "max rel degree", "convex hull"));
         bufferedWriter.newLine();
         bufferedWriter.close();
@@ -124,8 +124,8 @@ public class intervalStats {
             bufferedWriter.newLine();
         }
 
-        String formatHeaderNames="%-12s %-9s %-15s %-15s %-15s";
-        bufferedWriter.write(String.format(formatHeaderNames,"Minutes","Num of valid recordings","Avg. pupil size left", "Avg. pupil size left","Avg. pupil size both"));
+        String formatHeaderNames="%-12s %-12s %-15s %-15s %-15s";
+        bufferedWriter.write(String.format(formatHeaderNames,"Minutes","Num of valid recordings","Avg. pupil size left", "Avg. pupil size right","Avg. pupil size both"));
         bufferedWriter.newLine();
         bufferedWriter.close();
 
@@ -142,7 +142,6 @@ public class intervalStats {
 
             //Reading from the input file
             while ((line = bufferedReader.readLine()) != null) {
-               // System.out.println(line);
 
                 //Reading a line and getting timestamp
                  lines.add(line);
@@ -151,7 +150,6 @@ public class intervalStats {
 
                  //Checking if the timestamp is greater or equal to the stopping point
                 if (timestamp >= stoppingPoint || lineArray[0].equals(fixation.getFixationCount(inputFile))) {
-                      System.out.println("\nTrue\n");
                      //Writing to output file
                      FileWriter tempFileWriter = new FileWriter(tempURL);
                      BufferedWriter tempBufferedWriter = new BufferedWriter(tempFileWriter);

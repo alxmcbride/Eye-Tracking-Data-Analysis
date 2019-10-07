@@ -118,13 +118,12 @@ public class fixation {
                 int saccadeDetailsSize=saccadeDetails.size()-1;
                 Integer [] saccadeDetail= (Integer [])saccadeDetails.get(saccadeDetailsSize);
                 int interval=saccadeDetail[0];
-                System.out.println("Interval: "+interval);
 
-                String formatStr="%3s %12d %16f %18f %15f %15f %15f %13f  " +
-                        "%4d %14f %13f %12f %12f %10f %13f"+
-                        "%25f %14f %14f %14f %16f %18f  %16f %12f"+
-                        "%15f %14f %14f %14f %16f %16f"+
-                        "%17f %14f %11f %11f %11f %14f %18f";
+                String formatStr="%3s %16d %30f %20f %25f %18f %20f %20f  " +
+                        "%20d %20f %13f %20f %20f %20f %20f"+
+                        "%25f %14f %20f %25f %25f %20f  %17f %17f"+
+                        "%20f %14f %14f %14f %16f %16f"+
+                        "%17f %20f %17f %13f %11f %17f %18f";
                 String result=String.format(formatStr,
                         (interval/1000)/60,
                         allFixationDurations.size(),
