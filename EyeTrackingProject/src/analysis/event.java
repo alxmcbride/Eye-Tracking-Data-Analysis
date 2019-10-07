@@ -60,7 +60,7 @@ public class event {
             int timestampSize = timestamps.size() - 1;
             Integer interval = timestamps.get(timestampSize);
             System.out.println(allMouseLeft.size());
-            String formatStr = "%3d %6d ";
+            String formatStr = "%3d %12d ";
             String result = String.format(formatStr,
                     (interval / 1000) / 60,
                     allMouseLeft.size());

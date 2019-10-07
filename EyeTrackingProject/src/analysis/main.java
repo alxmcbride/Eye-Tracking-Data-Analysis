@@ -96,14 +96,14 @@ public class main {
 //        intervalGaze.processGaze(baselineInput, baselineOutput);
 //
 //        //analyze tree related data
-//          intervalStats.getFXDStats(treeFixationInput,treeFixationOutput);
-           intervalStats.getEVDStats(treeEventInput, treeEventOutput);
-//          intervalStats.getGZDStats(treeGazeInput, treeGazeOutput);
+ //          intervalStats.getFXDStats(treeFixationInput,treeFixationOutput);
+ //          intervalStats.getEVDStats(treeEventInput, treeEventOutput);
+ //         intervalStats.getGZDStats(treeGazeInput, treeGazeOutput);
 ////
 ////      //analyze graph related data
 //        intervalFixation.processFixation(graphFixationInput, graphFixationOutput);
  //         intervalStats.getEVDStats(graphEventInput, graphEventOutput);
-//        intervalGaze.processGaze(graphGazeInput, graphGazeOutput);
+        intervalGaze.processGaze(graphGazeInput, graphGazeOutput);
 	}
 
 }

@@ -65,7 +65,7 @@ public class gaze {
 			int timestampSize=timestamps.size()-1;
 			Integer interval= timestamps.get(timestampSize);
 
-			String formatStr="%3d %12d %14f %14f %16f";
+			String formatStr="%12d %12d %14f %14f %16f";
 			String result=String.format(formatStr,
 					(interval/1000)/60,
 					allValidData.size(),

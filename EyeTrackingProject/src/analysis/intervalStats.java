@@ -46,11 +46,12 @@ public class intervalStats {
 
         String formatFieldNames = "%-9s %-9s %-20s %-15s %-15s %-15s %-12s %-12s  %-6s %-14s %-12s %-12s %-12s %-9s %-21s  %-16s %-16s %-11s"
                 + " %-20s %-16s %-12s   %-16s  %-9s   %-15s %-15s %-15s %-15s %-15s %-11s   %-16s %-13s %-12s %-12s %-12s %-11s   %-9s";
-        bufferedWriter.write(String.format(formatFieldNames, "minutes", "ttl fxd", "sum fxd", "mean xd", "med fxd", "SD fxd", "min fxd", "max fxd"
-                , "scd", "sum scdL", "mean scdL", "med scdL", "SD scdL", "min scdL", "max scdL"
-                , "sum scdr", "mean scdr", "med scdr", "SD scdr", "min scdr", "max scdr"
-                , "spth", "fxd2scd", "sum ad", " mean ad", " med ad", "SD ad", "min ad", "max ad"
-                , "sum rd", " mean rd", " med rd", "SD rd", "min rd", "max rd", "cvx hull"));
+        bufferedWriter.write(String.format(formatFieldNames, "minutes", "total fixation duration", "sum fixation duration", "mean fixation duration"
+                ,"median fixation duration", "SD fixation duration", "min fixation duration", "max fixation duration"
+                , "scd", "sum saccadeLength", "mean saccade length", "median saccade length", "SD saccade length", "min saccade length", "max saccade length"
+                , "sum saccade duration", "mean saccade duration", "median saccade duration", "SD saccade duration", "min saccade duration", "max saccade duration"
+                , "scanpath", "fxation to saccade", "sum abs degree", " mean abs degree", " med abs degree", "SD abs degree", "min abs degree", "max abs degree"
+                , "sum rel degree", " mean rel degree", " median rel degree", "SD rel degree", "min rel degree", "max rel degree", "convex hull"));
         bufferedWriter.newLine();
         bufferedWriter.close();
 
@@ -123,8 +124,8 @@ public class intervalStats {
             bufferedWriter.newLine();
         }
 
-        String formatHeaderNames="%-9s %-9s %-15s %-15s %-15s";
-        bufferedWriter.write(String.format(formatHeaderNames,"mins","# vr","aps le", "aps re","aps both"));
+        String formatHeaderNames="%-12s %-9s %-15s %-15s %-15s";
+        bufferedWriter.write(String.format(formatHeaderNames,"Minutes","Num of valid recordings","Avg. pupil size left", "Avg. pupil size left","Avg. pupil size both"));
         bufferedWriter.newLine();
         bufferedWriter.close();
 
@@ -196,7 +197,7 @@ public class intervalStats {
             bufferedWriter.newLine();
         }
 
-        bufferedWriter.write("minutes   Left mouse clicks");
+        bufferedWriter.write("Minutes   Left mouse clicks");
         bufferedWriter.newLine();
         bufferedWriter.close();
 
@@ -241,7 +242,7 @@ public class intervalStats {
                 }
 
             }
-            System.out.println(fixation.getFixationCount())
+            System.out.println(fixation.getFixationCount(inputFile));
 
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
