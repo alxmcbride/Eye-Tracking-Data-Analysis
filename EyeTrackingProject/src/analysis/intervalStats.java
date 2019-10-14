@@ -33,16 +33,24 @@ public class intervalStats {
         String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\tempFile.txt";
 
         //Writing the header name for each column
-        FileWriter fileWriter = new FileWriter(outputFile, true);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        FileWriter fileWriter;
+        BufferedWriter bufferedWriter;
         if (isSlidingWindow){
+            outputFile=outputFile+"FXD_SLD_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Sliding Window Stats");
             bufferedWriter.newLine();
+
+
         }else{
+            outputFile=outputFile+"FXD_EXT_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Extending Window Stats");
             bufferedWriter.newLine();
-        }
 
+        }
 
         String formatFieldNames = "%-9s %-9s %-20s %-15s %-15s %-15s %-12s %-12s  %-6s %-14s %-12s %-12s %-12s %-9s %-21s  %-16s %-16s %-11s"
                 + " %-20s %-16s %-12s   %-16s  %-9s   %-15s %-15s %-15s %-15s %-15s %-11s   %-16s %-13s %-12s %-12s %-12s %-11s   %-9s";
@@ -70,32 +78,62 @@ public class intervalStats {
             //Reading from the input file
             while ((line = bufferedReader.readLine()) != null) {
 
-                //Reading a line and getting timestamp
+                //Reading a line
                 lines.add(line);
-                String[] lineArray = fixation.lineToArray(line);
-                int timestamp = Integer.parseInt(lineArray[1]);
+            }
 
-                //Checking if the timestamp is greater or equal to the stopping point
-                if (timestamp >= stoppingPoint || lineArray[0].equals(fixation.getFixationCount(inputFile))) {
+            //Want to get endpoint for the first interval
+            int endIndex=0;
+            for(String entry: lines){
+                String[]lineArray=fixation.lineToArray(entry);
+                int timestamp=Integer.parseInt(lineArray[1]);
+                if (timestamp>=stoppingPoint){
+                    endIndex=lines.indexOf(entry);
+                    break;
+                }
+            }
 
-                    //Writing to output file
-                    FileWriter tempFileWriter = new FileWriter(tempURL);
-                    BufferedWriter tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                    for (String entry : lines) {
-                        tempBufferedWriter.write(entry);
-                        tempBufferedWriter.newLine();
+            int startIndex=0;   //Will use only for the sliding window for shifting the starting point
+            stoppingPoint+=intervalLengthInMilliseconds;
+            FileWriter tempFileWriter;
+            BufferedWriter tempBufferedWriter;
+            //will check if the next interval goes for the set amount of time
+            for(int i=endIndex+1;i<lines.size();i++){
+                String[]lineArray=fixation.lineToArray(lines.get(i));
+                int timestamp=Integer.parseInt(lineArray[1]);
+                //once it reaches the end of the inteval, will write to the temp file
+                if (timestamp>=stoppingPoint){
+                    tempFileWriter = new FileWriter(tempURL);
+                    tempBufferedWriter = new BufferedWriter(tempFileWriter);
+                    for (int j=startIndex;j<=endIndex;j++) {
+                         tempBufferedWriter.write(lines.get(j));
+                         tempBufferedWriter.newLine();
                     }
-                    tempBufferedWriter.close();
+                     tempBufferedWriter.close();
                     fixation.processFixation(tempURL, outputFile);
                     stoppingPoint += intervalLengthInMilliseconds;
-
-                    //Used to determine if chosen option is Extending Window or Sliding Window
                     if(isSlidingWindow){
-                        lines=new ArrayList<String>(); //makes a new empty list if Sliding Window
+                     startIndex=endIndex+1;
                     }
-                }
+                    endIndex=i;
 
+                }
             }
+
+            //used to write for the very last interval
+            tempFileWriter = new FileWriter(tempURL);
+            tempBufferedWriter = new BufferedWriter(tempFileWriter);
+            for (int j=startIndex;j<lines.size();j++) {
+                tempBufferedWriter.write(lines.get(j));
+                tempBufferedWriter.newLine();
+            }
+            tempBufferedWriter.close();
+            fixation.processFixation(tempURL, outputFile);
+
+
+
+
+            //Deleting temp file
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
             bufferedReader.close();
@@ -114,14 +152,23 @@ public class intervalStats {
         String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\tempFile.txt";
 
         //Writing the header name for each column
-        FileWriter fileWriter = new FileWriter(outputFile, true);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        FileWriter fileWriter;
+        BufferedWriter bufferedWriter;
         if (isSlidingWindow){
+            outputFile=outputFile+"GZD_SLD_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Sliding Window Stats");
             bufferedWriter.newLine();
+
+
         }else{
+            outputFile=outputFile+"GZD_EXT_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Extending Window Stats");
             bufferedWriter.newLine();
+
         }
 
         String formatHeaderNames="%-12s %-12s %-15s %-15s %-15s";
@@ -143,31 +190,54 @@ public class intervalStats {
             //Reading from the input file
             while ((line = bufferedReader.readLine()) != null) {
 
-                //Reading a line and getting timestamp
-                 lines.add(line);
-                 String[] lineArray = fixation.lineToArray(line);
-                 int timestamp = Integer.parseInt(lineArray[0]);
-
-                 //Checking if the timestamp is greater or equal to the stopping point
-                if (timestamp >= stoppingPoint || lineArray[0].equals(fixation.getFixationCount(inputFile))) {
-                     //Writing to output file
-                     FileWriter tempFileWriter = new FileWriter(tempURL);
-                     BufferedWriter tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                     for (String entry : lines) {
-                        tempBufferedWriter.write(entry);
-                        tempBufferedWriter.newLine();
-                     }
-                     tempBufferedWriter.close();
-                      gaze.processGaze(tempURL, outputFile);
-                     stoppingPoint += intervalLengthInMilliseconds;
-//
-                    //Used to determine if chosen option is Extending Window or Sliding Window
-                    if(isSlidingWindow){
-                    lines=new ArrayList<String>(); //makes a new empty list if Sliding Window
-                     }
-                 }
-
+                //Reading a line
+                lines.add(line);
             }
+
+            //Want to get endpoint for the first interval
+            int endIndex=0;
+            for(String entry: lines){
+                String[]lineArray=fixation.lineToArray(entry);
+                int timestamp=Integer.parseInt(lineArray[0]);
+                if (timestamp>=stoppingPoint){
+                    endIndex=lines.indexOf(entry);
+                    break;
+                }
+            }
+
+            int startIndex=0;   //Will used only for the sliding window for shifting the starting point
+            stoppingPoint+=intervalLengthInMilliseconds;
+            FileWriter tempFileWriter;
+            BufferedWriter tempBufferedWriter;
+            for(int i=endIndex+1;i<lines.size();i++){
+                String[]lineArray=fixation.lineToArray(lines.get(i));
+                int timestamp=Integer.parseInt(lineArray[0]);
+                if (timestamp>=stoppingPoint){
+                    tempFileWriter = new FileWriter(tempURL);
+                    tempBufferedWriter = new BufferedWriter(tempFileWriter);
+                    for (int j=startIndex;j<=endIndex;j++) {
+                        tempBufferedWriter.write(lines.get(j));
+                        tempBufferedWriter.newLine();
+                    }
+                    tempBufferedWriter.close();
+                    gaze.processGaze(tempURL, outputFile);
+                    stoppingPoint += intervalLengthInMilliseconds;
+                    if(isSlidingWindow){
+                        startIndex=endIndex+1;
+                    }
+                    endIndex=i;
+
+                }
+            }
+            tempFileWriter = new FileWriter(tempURL);
+            tempBufferedWriter = new BufferedWriter(tempFileWriter);
+            for (int j=startIndex;j<lines.size();j++) {
+                tempBufferedWriter.write(lines.get(j));
+                tempBufferedWriter.newLine();
+            }
+            tempBufferedWriter.close();
+            gaze.processGaze(tempURL, outputFile);
+
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
             bufferedReader.close();
@@ -185,14 +255,23 @@ public class intervalStats {
         String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\tempFile.txt";
 
         //Writing the header name for each column
-        FileWriter fileWriter = new FileWriter(outputFile, true);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        FileWriter fileWriter;
+        BufferedWriter bufferedWriter;
         if (isSlidingWindow){
+            outputFile=outputFile+"EVD_SLD_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Sliding Window Stats");
             bufferedWriter.newLine();
+
+
         }else{
+            outputFile=outputFile+"EVD_EXT_Results.txt";
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write("Extending Window Stats");
             bufferedWriter.newLine();
+
         }
 
         bufferedWriter.write("Minutes   Left mouse clicks");
@@ -212,36 +291,56 @@ public class intervalStats {
 
             //Reading from the input file
             while ((line = bufferedReader.readLine()) != null) {
-                // System.out.println(line);
 
-                //Reading a line and getting timestamp
+                //Reading a line
                 lines.add(line);
-                String[] lineArray = fixation.lineToArray(line);
-                int timestamp = Integer.parseInt(lineArray[0]);
+            }
 
-                //Checking if the timestamp is greater or equal to the stopping point
-                if (timestamp >= stoppingPoint || lineArray[0].equals(fixation.getFixationCount(inputFile))) {
+            //Want to get endpoint for the first interval
+            int endIndex=0;
+            for(String entry: lines){
+                String[]lineArray=fixation.lineToArray(entry);
+                int timestamp=Integer.parseInt(lineArray[0]);
+                if (timestamp>=stoppingPoint){
+                    endIndex=lines.indexOf(entry);
+                    break;
+                }
+            }
 
-                    //Writing to output file
-                    FileWriter tempFileWriter = new FileWriter(tempURL);
-                    BufferedWriter tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                    for (String entry : lines) {
-                        tempBufferedWriter.write(entry);
+            int startIndex=0;   //Will used only for the sliding window for shifting the starting point
+            stoppingPoint+=intervalLengthInMilliseconds;
+            FileWriter tempFileWriter;
+            BufferedWriter tempBufferedWriter;
+            for(int i=endIndex+1;i<lines.size();i++){
+                String[]lineArray=fixation.lineToArray(lines.get(i));
+                int timestamp=Integer.parseInt(lineArray[0]);
+                if (timestamp>=stoppingPoint){
+                    tempFileWriter = new FileWriter(tempURL);
+                    tempBufferedWriter = new BufferedWriter(tempFileWriter);
+                    for (int j=startIndex;j<=endIndex;j++) {
+                        tempBufferedWriter.write(lines.get(j));
                         tempBufferedWriter.newLine();
                     }
                     tempBufferedWriter.close();
                     event.processEvent(tempURL, outputFile);
                     stoppingPoint += intervalLengthInMilliseconds;
-//
-                    //Used to determine if chosen option is Extending Window or Sliding Window
                     if(isSlidingWindow){
-                        lines=new ArrayList<String>(); //makes a new empty list if Sliding Window
+                        startIndex=endIndex+1;
                     }
+                    endIndex=i;
+
                 }
-
             }
-            System.out.println(fixation.getFixationCount(inputFile));
+            tempFileWriter = new FileWriter(tempURL);
+            tempBufferedWriter = new BufferedWriter(tempFileWriter);
+            for (int j=startIndex;j<lines.size();j++) {
+                tempBufferedWriter.write(lines.get(j));
+                tempBufferedWriter.newLine();
+            }
+            tempBufferedWriter.close();
+            event.processEvent(tempURL, outputFile);
 
+            //Deleting temp file
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
             bufferedReader.close();

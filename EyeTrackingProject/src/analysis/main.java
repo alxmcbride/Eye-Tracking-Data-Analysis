@@ -52,58 +52,54 @@ public class main {
 		//testing cases where X axis values are the same
 		//String fixationData = "fxdSameXValues.txt";
 		String treeFixation = participant + ".treeFXD.txt";
-		String treeFixationResults = "treeFXDResults.txt";
-		String treeFixationInput = inputLocation + treeFixation;
-        String treeFixationOutput = outputLocation + treeFixationResults; 
+		String treeFixationInput=inputLocation + treeFixation;
+
         
         String graphFixation = participant + ".graphFXD.txt";
-        String graphFixationResults = "graphFXDResults.txt";
         String graphFixationInput = inputLocation + graphFixation;
-        String graphFixationOutput = outputLocation + graphFixationResults;
 		
 		//EVD data
 		String treeEvent = participant + ".treeEVD.txt";
-		String treeEventResults = "treeEVDResults.txt";
 		String treeEventInput = inputLocation + treeEvent;
-        String treeEventOutput = outputLocation + treeEventResults;
         
         String graphEvent = participant + ".graphEVD.txt";
-        String graphEventResults = "graphEVDResults.txt";
         String graphEventInput = inputLocation + graphEvent;
-        String graphEventOutput = outputLocation + graphEventResults;
-;
+
+
         
         //GZD data
         String gazeBaseline = participant + "GZD.txt";
-        String baselineResults = "baselineResults.txt";
         String baselineInput = inputLocation + gazeBaseline;
-        String baselineOutput = outputLocation + baselineResults;
         
         String treeGaze = participant + ".treeGZD.txt";
-        String treeGazeResults = "treeGZDResults.txt";
         String treeGazeInput = inputLocation + treeGaze;
-        String treeGazeOutput = outputLocation + treeGazeResults;
         
         String graphGaze = participant + ".graphGZD.txt";
-        String graphGazeResults = "graphGZDResults.txt";
         String graphGazeInput = inputLocation + graphGaze;
-        String graphGazeOutput = outputLocation + graphGazeResults;
+
+        //Baseline Output files
+        String baselineOutput=outputLocation+"baseline";
+        //Tree output files
+        String treeOutput=outputLocation+"tree";
+
+        //Graph output files
+        String graphOutput=outputLocation+"graph";
 
 
          Scanner in = new Scanner(System.in);
 
           //analyze gaze baseline
-//        intervalGaze.processGaze(baselineInput, baselineOutput);
+        intervalStats.getGZDStats(baselineInput,baselineOutput);
 //
 //        //analyze tree related data
-          intervalStats.getFXDStats(treeFixationInput,treeFixationOutput);
-//          intervalStats.getEVDStats(treeEventInput, treeEventOutput);
-//          intervalStats.getGZDStats(treeGazeInput, treeGazeOutput);
+//         intervalStats.getFXDStats(treeFixationInput, treeOutput);
+         intervalStats.getEVDStats(treeEventInput, treeOutput);
+//          intervalStats.getGZDStats(treeGazeInput, treeOutput);
 ////
 ////      //analyze graph related data
-//        intervalFixation.processFixation(graphFixationInput, graphFixationOutput);
- //         intervalStats.getEVDStats(graphEventInput, graphEventOutput);
- //       intervalGaze.processGaze(graphGazeInput, graphGazeOutput);
+ //          intervalStats.getFXDStats(graphFixationInput, graphOutput);
+        intervalStats.getEVDStats(graphEventInput, graphOutput);
+ //         intervalStats.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }

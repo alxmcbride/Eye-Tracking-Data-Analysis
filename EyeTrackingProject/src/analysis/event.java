@@ -47,19 +47,23 @@ public class event {
         try {
             FileReader fileReader = new FileReader(inputFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+            int count=0;
             while ((line = bufferedReader.readLine()) != null && line.isEmpty() == false) {
 
                 String[] lineArray = fixation.lineToArray(line);
                 int timestamp = Integer.parseInt(lineArray[0]);
-                timestamps.add(timestamp);
+
+
                 if (lineArray[1].equals("LMouseButton") && lineArray[2].equals("1")) {
                     allMouseLeft.add(lineArray);
+                    timestamps.add(timestamp);
+                    count++;
+                    System.out.println(line);
                 }
 
             }
             int timestampSize = timestamps.size() - 1;
             Integer interval = timestamps.get(timestampSize);
-            System.out.println(allMouseLeft.size());
             String formatStr = "%3d %12d ";
             String result = String.format(formatStr,
                     (interval / 1000) / 60,
@@ -70,7 +74,7 @@ public class event {
             
             bufferedWriter.close();
             bufferedReader.close();
-
+            System.out.println(count);
             System.out.println("done writing event data to: " + outputFile);
 		
 		}catch(FileNotFoundException ex) {
