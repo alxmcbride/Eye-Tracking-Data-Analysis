@@ -34,12 +34,10 @@ import java.util.ArrayList;
 
 
 public class event {
-
-	public static void processEvent(String inputFile, String outputFile) throws IOException {
-		
-		String line = null;
+    public static void processEvent(String inputFile, String outputFile, int interval) throws IOException {
+        String line = null;
         ArrayList<Object> allMouseLeft = new ArrayList<Object>();
-        
+
         FileWriter fileWriter = new FileWriter(outputFile,true);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         ArrayList<Integer> timestamps= new ArrayList<Integer>();
@@ -47,42 +45,73 @@ public class event {
         try {
             FileReader fileReader = new FileReader(inputFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            int count=0;
             while ((line = bufferedReader.readLine()) != null && line.isEmpty() == false) {
 
                 String[] lineArray = fixation.lineToArray(line);
-                int timestamp = Integer.parseInt(lineArray[0]);
 
 
                 if (lineArray[1].equals("LMouseButton") && lineArray[2].equals("1")) {
                     allMouseLeft.add(lineArray);
-                    timestamps.add(timestamp);
-                    count++;
-                    System.out.println(line);
                 }
 
             }
-            int timestampSize = timestamps.size() - 1;
-            Integer interval = timestamps.get(timestampSize);
+
             String formatStr = "%3d %12d ";
             String result = String.format(formatStr,
-                    (interval / 1000) / 60,
+                    (interval/1000)/60,
                     allMouseLeft.size());
             bufferedWriter.write(result);
             bufferedWriter.newLine();
 
-            
+
             bufferedWriter.close();
             bufferedReader.close();
-            System.out.println(count);
             System.out.println("done writing event data to: " + outputFile);
-		
-		}catch(FileNotFoundException ex) {
-	        System.out.println("Unable to open file '" + inputFile + "'");				
-	    }catch(IOException ex) {
-	        System.out.println("Error reading file '" + inputFile + "'");			
-	    }
-	}
+
+        }catch(FileNotFoundException ex) {
+            System.out.println("Unable to open file '" + inputFile + "'");
+        }catch(IOException ex) {
+            System.out.println("Error reading file '" + inputFile + "'");
+        }
+    }
+
+
+	public static void processEvent(String inputFile, String outputFile) throws IOException {
+
+
+        String line = null;
+        ArrayList<Object> allMouseLeft = new ArrayList<Object>();
+
+        FileWriter fileWriter = new FileWriter(outputFile);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+        try {
+            FileReader fileReader = new FileReader(inputFile);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while((line = bufferedReader.readLine()) != null && line.isEmpty()==false) {
+
+                String[] lineArray = fixation.lineToArray(line);
+
+                if(lineArray[1].equals("LMouseButton") && lineArray[2].equals("1")){
+                    allMouseLeft.add(lineArray);
+                }
+
+            }
+
+            bufferedWriter.write("total number of L mouse clicks: " + allMouseLeft.size());
+            bufferedWriter.newLine();
+
+            bufferedWriter.close();
+            bufferedReader.close();
+
+            System.out.println("done writing event data to: " + outputFile);
+
+        }catch(FileNotFoundException ex) {
+            System.out.println("Unable to open file '" + inputFile + "'");
+        }catch(IOException ex) {
+            System.out.println("Error reading file '" + inputFile + "'");
+        }
+    }
 	
 }
 	

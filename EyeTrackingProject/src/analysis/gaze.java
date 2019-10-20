@@ -33,6 +33,54 @@ import java.util.ArrayList;
  */
 
 public class gaze {
+	public static void processGaze(String inputFile, String outputFile, int interval) throws IOException{
+		String line = null;
+		ArrayList<Object> allValidData = new ArrayList<Object>();
+
+		FileWriter fileWriter = new FileWriter(outputFile,true);
+		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+		ArrayList<Integer> timestamps= new ArrayList<Integer>();
+
+		try {
+			FileReader fileReader = new FileReader(inputFile);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			while((line = bufferedReader.readLine()) != null) {
+				String[] lineArray = fixation.lineToArray(line);
+				timestamps.add(Integer.parseInt(lineArray[0]));
+				//checking the validity of the recording
+				//a code with 0 indicates the eye tracker was confident with this data
+				//note that only instances where BOTH pupil sizes are valid will be used in the analysis
+				if(lineArray[8].equals("0") && lineArray[15].equals("0")){
+					double pupilLeft = Double.parseDouble(lineArray[7]);
+					double pupilRight = Double.parseDouble(lineArray[14]);
+					double[] pupilSizes = new double[2];
+					pupilSizes[0] = pupilLeft;
+					pupilSizes[1] = pupilRight;
+					allValidData.add(pupilSizes);
+				}
+
+			}
+
+
+			String formatStr="%6d %18d %25f %20f %20f";
+			String result=String.format(formatStr,
+					(interval/1000)/60,
+					allValidData.size(),
+					getAverageOfLeft(allValidData),
+					getAverageOfRight(allValidData),
+					getAverageOfBoth(allValidData));
+			bufferedWriter.write(result);
+			bufferedWriter.newLine();
+			bufferedWriter.close();
+			bufferedReader.close();
+			System.out.println("done writing gaze data to: " + outputFile);
+
+		}catch(FileNotFoundException ex) {
+			System.out.println("Unable to open file '" + inputFile + "'");
+		}catch(IOException ex) {
+			System.out.println("Error reading file '" + inputFile + "'");
+		}
+	}
 	
 	public static void processGaze(String inputFile, String outputFile) throws IOException{
 		String line = null;
