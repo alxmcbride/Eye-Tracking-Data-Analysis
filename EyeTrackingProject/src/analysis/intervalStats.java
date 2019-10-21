@@ -308,6 +308,9 @@ public class intervalStats {
              if(!line.equals("")) {
                  //Reading a line
                  lines.add(line);
+                 System.out.println(line);
+             }else if(line.equals("")){
+                 break;
              }
             }
             bufferedReader.close();
