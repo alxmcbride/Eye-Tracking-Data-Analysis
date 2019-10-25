@@ -20,7 +20,7 @@ public class intervalStats {
 
     private static int intervalLengthInMilliseconds = intervalLengthInMinutes * 60 * 1000; //Converting minutes to seconds
 
-    private static String intervalStatsType = "extending";  //<----- ENTER: "sliding" for Sliding Window Stats    "extending" for Extending Window Stats
+    private static String intervalStatsType = "sliding";  //<----- ENTER: "sliding" for Sliding Window Stats   "extending" for Extending Window Stats
 
 
 
@@ -86,21 +86,22 @@ public class intervalStats {
             for(String entry : lines){
                 String[]lineArray = fixation.lineToArray(entry);
                 int timestamp = Integer.parseInt(lineArray[1]);
+                //when it finds the endpoint, will save it
+                //if the timestamp equals the stopping point, include in the lines to be processed
                 if (timestamp == stoppingPoint) {
                     endIndex = lines.indexOf(entry);
-                    //    System.out.printf("End: %d ",endIndex);
                     break;
+                    //if the timestamp equals the stopping point, exclude the lines to be processed
                 }else if(timestamp > stoppingPoint) {
                     endIndex = (lines.indexOf(entry))-1;
-                    //    System.out.printf("End: %d ",endIndex);
                     break;
                 }
 
             }
-            //Holding for the interval being processed
+            //Holding for the interval to be currently processed
             int intervalToBeProcessed=stoppingPoint;
 
-            //Looking to find the endpoint for the next interval
+            //Looking to find the endpoint for the next interval after the current to be processed
             stoppingPoint+=intervalLengthInMilliseconds;
 
 
@@ -108,35 +109,43 @@ public class intervalStats {
 
 
             for(int i=endIndex+1;i<lines.size();i++){
+                //Looking for the point where the interval ends
                 String[]lineArray=fixation.lineToArray(lines.get(i));
                 int timestamp=Integer.parseInt(lineArray[1]);
+
+                //If point is found, will go on and process up to intervalToBeProcessed
                 if (timestamp>=stoppingPoint){
                     tempFileWriter = new FileWriter(tempURL);
                     tempBufferedWriter = new BufferedWriter(tempFileWriter);
                     for (int j=startIndex;j<=endIndex;j++) {
                         tempBufferedWriter.write(lines.get(j));
-                        //    System.out.println(lines.get(j));
                         tempBufferedWriter.newLine();
                     }
                     tempBufferedWriter.close();
                     fixation.processFixation(tempURL, outputFile,intervalToBeProcessed);
+
+                    //if sliding window, will update the start index to not include previous lines processed
                     if(intervalStatsType.equals("sliding")){
                         startIndex=endIndex+1;
                     }
+
+                    //Updating the end index
                     if (timestamp == stoppingPoint) {
                         endIndex = i;
                     }else if(timestamp > stoppingPoint) {
                         endIndex =i-1;
                     }
+                    //Update the stopping point and interval to be processed
                     stoppingPoint += intervalLengthInMilliseconds;
                     intervalToBeProcessed+=intervalLengthInMilliseconds;
                 }
             }
+
+            //Process the very last set of lines
             tempFileWriter = new FileWriter(tempURL);
             tempBufferedWriter = new BufferedWriter(tempFileWriter);
             for (int j=startIndex;j<lines.size();j++) {
                 tempBufferedWriter.write(lines.get(j));
-                // System.out.println(lines.get(j));
                 tempBufferedWriter.newLine();
             }
             tempBufferedWriter.close();
@@ -152,9 +161,10 @@ public class intervalStats {
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
             bufferedReader.close();
-        } catch (FileNotFoundException ex) {
+
+        } catch (FileNotFoundException ex) { //if file not found
             System.out.println("Unable to open file '" + inputFile + "'");
-        } catch (IOException ex) {
+        } catch (IOException ex) { //if other exception with the file
             System.out.println("Error reading file '" + inputFile + "'");
         }
     }
@@ -206,50 +216,67 @@ public class intervalStats {
                 }
             }
 
+            //Getting endpoint(the point that is greater or equal to the current stopping point) for the first interval
             int endIndex = 0;
-            //Want to get endpoint for the first interval
-            for(String entry : lines) {
-                String[] lineArray = fixation.lineToArray(entry);
+            for(String entry : lines){
+                String[]lineArray = fixation.lineToArray(entry);
                 int timestamp = Integer.parseInt(lineArray[0]);
+                //when it finds the endpoint, will save it
+                //if the timestamp equals the stopping point, include in the lines to be processed
                 if (timestamp == stoppingPoint) {
                     endIndex = lines.indexOf(entry);
-                     //  System.out.printf("End: %d\n",endIndex);
                     break;
-                } else if (timestamp > stoppingPoint) {
-                    endIndex = (lines.indexOf(entry)) - 1;
-                    // System.out.printf("End: %d\n",endIndex);
+                    //if the timestamp equals the stopping point, exclude the lines to be processed
+                }else if(timestamp > stoppingPoint) {
+                    endIndex = (lines.indexOf(entry))-1;
                     break;
                 }
-            }
 
+            }
+            //Holding for the interval to be currently processed
             int intervalToBeProcessed=stoppingPoint;
+
+            //Looking to find the endpoint for the next interval after the current to be processed
             stoppingPoint+=intervalLengthInMilliseconds;
-            int startIndex=0;   //Will used only for the sliding window for shifting the starting point
+
+
+            int startIndex=0;   //Will change from zero ONLY when gathering sliding window stats
 
 
             for(int i=endIndex+1;i<lines.size();i++){
+                //Looking for the point where the interval ends
                 String[]lineArray=fixation.lineToArray(lines.get(i));
                 int timestamp=Integer.parseInt(lineArray[0]);
+
+                //If point is found, will go on and process up to intervalToBeProcessed
                 if (timestamp>=stoppingPoint){
                     tempFileWriter = new FileWriter(tempURL);
                     tempBufferedWriter = new BufferedWriter(tempFileWriter);
                     for (int j=startIndex;j<=endIndex;j++) {
                         tempBufferedWriter.write(lines.get(j));
-                       // System.out.println(lines.get(j));
                         tempBufferedWriter.newLine();
                     }
                     tempBufferedWriter.close();
-                    gaze.processGaze(tempURL, outputFile, intervalToBeProcessed);
+                    gaze.processGaze(tempURL, outputFile,intervalToBeProcessed);
+
+                    //if sliding window, will update the start index to not include previous lines processed
+                    if(intervalStatsType.equals("sliding")){
+                        startIndex=endIndex+1;
+                    }
+
+                    //Updating the end index
                     if (timestamp == stoppingPoint) {
                         endIndex = i;
                     }else if(timestamp > stoppingPoint) {
                         endIndex =i-1;
                     }
+                    //Update the stopping point and interval to be processed
                     stoppingPoint += intervalLengthInMilliseconds;
                     intervalToBeProcessed+=intervalLengthInMilliseconds;
-
                 }
             }
+
+            //Process the very last set of lines
             tempFileWriter = new FileWriter(tempURL);
             tempBufferedWriter = new BufferedWriter(tempFileWriter);
             for (int j=startIndex;j<lines.size();j++) {
@@ -262,9 +289,11 @@ public class intervalStats {
             int lastInterval=Integer.parseInt(lastArray[0]);
             gaze.processGaze(tempURL, outputFile, lastInterval);
 
+            //Deleting temp file
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
             bufferedReader.close();
+
         } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + inputFile + "'");
         } catch (IOException ex) {
@@ -280,13 +309,19 @@ public class intervalStats {
         }else{
             outputFile=outputFile+"EVD_EXT_Results.txt";
         }
-
-        //Writing the header name for each column to the output file
+        //Writer for the output file
         FileWriter fileWriter=new FileWriter(outputFile);
         BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
+
+        //Writing the header name for each column to the output file
         bufferedWriter.write("Minutes   Left mouse clicks");
         bufferedWriter.newLine();
         bufferedWriter.close();
+
+        //Writer for temporary file
+        String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\tempFile.txt";
+        FileWriter tempFileWriter;
+        BufferedWriter tempBufferedWriter;
 
         try {
             //FileReader for inputFile
@@ -308,81 +343,90 @@ public class intervalStats {
              if(!line.equals("")) {
                  //Reading a line
                  lines.add(line);
-                 System.out.println(line);
-             }else if(line.equals("")){
-                 break;
-             }
+                }
+
             }
             bufferedReader.close();
 
-            //FileWriter for temporary file
-            String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\tempFile.txt";
 
-            //Want to get endpoint for the first interval
+            //Getting endpoint(the point that is greater or equal to the current stopping point) for the first interval
             int endIndex = 0;
             for(String entry : lines){
                 String[]lineArray = fixation.lineToArray(entry);
-                    int timestamp = Integer.parseInt(lineArray[0]);
-                    if (timestamp == stoppingPoint) {
-                        endIndex = lines.indexOf(entry);
-                    //    System.out.printf("End: %d ",endIndex);
-                        break;
-                    }else if(timestamp > stoppingPoint) {
-                        endIndex = (lines.indexOf(entry))-1;
-                    //    System.out.printf("End: %d ",endIndex);
-                        break;
-                    }
-
+                int timestamp = Integer.parseInt(lineArray[0]);
+                //when it finds the endpoint, will save it
+                //if the timestamp equals the stopping point, include in the lines to be processed
+                if (timestamp == stoppingPoint) {
+                    endIndex = lines.indexOf(entry);
+                    break;
+                    //if the timestamp equals the stopping point, exclude the lines to be processed
+                }else if(timestamp > stoppingPoint) {
+                    endIndex = (lines.indexOf(entry))-1;
+                    break;
                 }
 
-
-            int startIndex=0;   //Will only change for the sliding window for shifting the starting point
+            }
+            //Holding for the interval to be currently processed
             int intervalToBeProcessed=stoppingPoint;
+
+            //Looking to find the endpoint for the next interval after the current to be processed
             stoppingPoint+=intervalLengthInMilliseconds;
-            FileWriter tempFileWriter;
-            BufferedWriter tempBufferedWriter;
+
+
+            int startIndex=0;   //Will change from zero ONLY when gathering sliding window stats
+
+
             for(int i=endIndex+1;i<lines.size();i++){
+                //Looking for the point where the interval ends
                 String[]lineArray=fixation.lineToArray(lines.get(i));
                 int timestamp=Integer.parseInt(lineArray[0]);
+
+                //If point is found, will go on and process up to intervalToBeProcessed
                 if (timestamp>=stoppingPoint){
                     tempFileWriter = new FileWriter(tempURL);
                     tempBufferedWriter = new BufferedWriter(tempFileWriter);
                     for (int j=startIndex;j<=endIndex;j++) {
                         tempBufferedWriter.write(lines.get(j));
-                    //    System.out.println(lines.get(j));
                         tempBufferedWriter.newLine();
                     }
                     tempBufferedWriter.close();
                     event.processEvent(tempURL, outputFile,intervalToBeProcessed);
+
+                    //if sliding window, will update the start index to not include previous lines processed
                     if(intervalStatsType.equals("sliding")){
                         startIndex=endIndex+1;
                     }
+
+                    //Updating the end index
                     if (timestamp == stoppingPoint) {
                         endIndex = i;
                     }else if(timestamp > stoppingPoint) {
                         endIndex =i-1;
                     }
+                    //Update the stopping point and interval to be processed
                     stoppingPoint += intervalLengthInMilliseconds;
                     intervalToBeProcessed+=intervalLengthInMilliseconds;
                 }
             }
+
+            //Process the very last set of lines
             tempFileWriter = new FileWriter(tempURL);
             tempBufferedWriter = new BufferedWriter(tempFileWriter);
             for (int j=startIndex;j<lines.size();j++) {
                 tempBufferedWriter.write(lines.get(j));
-               // System.out.println(lines.get(j));
                 tempBufferedWriter.newLine();
             }
             tempBufferedWriter.close();
             String lastline=lines.get(lines.size()-1);
             String [] lastArray=fixation.lineToArray(lastline);
             int lastInterval=Integer.parseInt(lastArray[0]);
-            event.processEvent(tempURL, outputFile,lastInterval) ;
+            event.processEvent(tempURL, outputFile, lastInterval);
 
             //Deleting temp file
-//            File tempFile = new File(tempURL);
-//            tempFile.deleteOnExit();
-//            bufferedReader.close();
+            File tempFile = new File(tempURL);
+            tempFile.deleteOnExit();
+            bufferedReader.close();
+
         } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + inputFile + "'");
         } catch (IOException ex) {

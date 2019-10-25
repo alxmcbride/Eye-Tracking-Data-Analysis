@@ -89,17 +89,17 @@ public class main {
          Scanner in = new Scanner(System.in);
 
          //analyze gaze baseline
- //       intervalStats.getGZDStats(baselineInput,baselineOutput);
+        intervalStats.getGZDStats(baselineInput,baselineOutput);
 
        //analyze tree related data
- //       intervalStats.getFXDStats(treeFixationInput, treeOutput);
-  //      intervalStats.getEVDStats(treeEventInput, treeOutput);
-  //      intervalStats.getGZDStats(treeGazeInput, treeOutput);
+        intervalStats.getFXDStats(treeFixationInput, treeOutput);
+        intervalStats.getEVDStats(treeEventInput, treeOutput);
+        intervalStats.getGZDStats(treeGazeInput, treeOutput);
 
         //analyze graph related data
-  //        intervalStats.getFXDStats(graphFixationInput, graphOutput);
+          intervalStats.getFXDStats(graphFixationInput, graphOutput);
           intervalStats.getEVDStats(graphEventInput, graphOutput);
-  //       intervalStats.getGZDStats(graphGazeInput, graphOutput);
+          intervalStats.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }
