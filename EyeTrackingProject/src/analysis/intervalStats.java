@@ -20,7 +20,7 @@ public class intervalStats {
 
     private static int intervalLengthInMilliseconds = intervalLengthInMinutes * 60 * 1000; //Converting minutes to seconds
 
-    private static String intervalStatsType = "sliding";  //<----- ENTER: "sliding" for Sliding Window Stats   "extending" for Extending Window Stats
+    private static String intervalStatsType = "sliding";  //<----- ENTER: "sliding" for Sliding Window Interval Stats   "extending" for Extending Window Interval Stats
 
 
 
@@ -303,7 +303,8 @@ public class intervalStats {
 
     public static void getEVDStats(String inputFile, String outputFile) throws IOException{
 
-        //Setting stats type and extension
+        //Setting i) file name based on stats type and ii) the file extension
+        //SLD- sliding window interval statistics  EXT- extending window interval statistics
         if (intervalStatsType.equals("sliding")){
             outputFile=outputFile+"EVD_SLD_Results.txt";
         }else{
@@ -390,7 +391,7 @@ public class intervalStats {
                         tempBufferedWriter.newLine();
                     }
                     tempBufferedWriter.close();
-                    event.processEvent(tempURL, outputFile,intervalToBeProcessed);
+                    event.processEvent(tempURL, outputFile,(intervalToBeProcessed/1000)/60);
 
                     //if sliding window, will update the start index to not include previous lines processed
                     if(intervalStatsType.equals("sliding")){
@@ -420,7 +421,7 @@ public class intervalStats {
             String lastline=lines.get(lines.size()-1);
             String [] lastArray=fixation.lineToArray(lastline);
             int lastInterval=Integer.parseInt(lastArray[0]);
-            event.processEvent(tempURL, outputFile, lastInterval);
+            event.processEvent(tempURL, outputFile, (lastInterval/1000)/60);
 
             //Deleting temp file
             File tempFile = new File(tempURL);

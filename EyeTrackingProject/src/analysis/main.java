@@ -41,9 +41,9 @@ public class main {
 		//specify the location of the raw data files
 		String inputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Participant Data\\";
 		//specify the location of the analyzed results 
-		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\";
+		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Percentage Results\\";
 		//specify the subject, e.g. p1, as analysis is generated per-participant
-		String participant = "p1";
+		String participant = "p36";
 		
 		String inputLocation = inputURL + participant + "\\";
 		String outputLocation = outputURL + participant + "\\";
@@ -89,17 +89,17 @@ public class main {
          Scanner in = new Scanner(System.in);
 
          //analyze gaze baseline
-        intervalStats.getGZDStats(baselineInput,baselineOutput);
+       percentageStats.getGZDStats(baselineInput,baselineOutput);
 
        //analyze tree related data
-        intervalStats.getFXDStats(treeFixationInput, treeOutput);
-        intervalStats.getEVDStats(treeEventInput, treeOutput);
-        intervalStats.getGZDStats(treeGazeInput, treeOutput);
-
-        //analyze graph related data
-          intervalStats.getFXDStats(graphFixationInput, graphOutput);
-          intervalStats.getEVDStats(graphEventInput, graphOutput);
-          intervalStats.getGZDStats(graphGazeInput, graphOutput);
+          percentageStats.getFXDStats(treeFixationInput, treeOutput);
+          percentageStats.getEVDStats(treeEventInput, treeOutput);
+          percentageStats.getGZDStats(treeGazeInput, treeOutput);
+//
+//        //analyze graph related data
+          percentageStats.getFXDStats(graphFixationInput, graphOutput);
+          percentageStats.getEVDStats(graphEventInput, graphOutput);
+          percentageStats.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }

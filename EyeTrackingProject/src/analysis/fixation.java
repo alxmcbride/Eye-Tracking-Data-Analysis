@@ -40,8 +40,10 @@ import java.util.StringTokenizer;
 
 
 public class fixation {
-
-    public static void processFixation(String inputFile, String outputFile, int interval) throws IOException{
+     /*
+        Overloaded method for gathering interval statistics or percentage statistics
+      */
+    public static void processFixation(String inputFile, String outputFile, double interval) throws IOException{
         String line = null;
         ArrayList<Integer> allFixationDurations = new ArrayList<Integer>();
         ArrayList<Object> allCoordinates = new ArrayList<Object>();
@@ -112,14 +114,14 @@ public class fixation {
             Point2D[] points = listToArray(boundingPoints);
 
 
-
-            String formatStr="%3s %16d %30f %20f %25f %18f %20f %20f  " +
+            //Writing statistical results to the output file
+            String formatStr="%6.1f %16d %30f %20f %25f %18f %20f %20f  " +
                     "%20d %20f %13f %20f %20f %20f %20f"+
                     "%25f %14f %20f %25f %25f %20f  %17f %17f"+
                     "%20f %14f %14f %14f %16f %16f"+
                     "%17f %20f %17f %13f %11f %17f %18f";
             String result=String.format(formatStr,
-                    (interval/1000)/60,
+                    interval,
                     allFixationDurations.size(),
                     descriptiveStats.getSumOfIntegers(allFixationDurations),
                     descriptiveStats.getMeanOfIntegers(allFixationDurations),
@@ -252,6 +254,7 @@ public class fixation {
                 Integer [] saccadeDetail= (Integer [])saccadeDetails.get(saccadeDetailsSize);
                 int interval=saccadeDetail[0];
 
+                //Writing statistical results to the output file
                 String formatStr="%3s %16d %30f %20f %25f %18f %20f %20f  " +
                         "%20d %20f %13f %20f %20f %20f %20f"+
                         "%25f %14f %20f %25f %25f %20f  %17f %17f"+

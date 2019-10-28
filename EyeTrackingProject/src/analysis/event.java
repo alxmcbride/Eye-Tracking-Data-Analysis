@@ -34,7 +34,10 @@ import java.util.ArrayList;
 
 
 public class event {
-    public static void processEvent(String inputFile, String outputFile, int interval) throws IOException {
+    /*
+       Overloaded method for gathering interval statistics or percentage statistics
+     */
+    public static void processEvent(String inputFile, String outputFile, double interval) throws IOException {
         String line = null;
         ArrayList<Object> allMouseLeft = new ArrayList<Object>();
 
@@ -56,9 +59,10 @@ public class event {
 
             }
 
-            String formatStr = "%3d %12d ";
+            //Writing statistical results to the output file
+            String formatStr = "%6.1f %12d ";
             String result = String.format(formatStr,
-                    (interval/1000)/60,
+                    interval,
                     allMouseLeft.size());
             bufferedWriter.write(result);
             bufferedWriter.newLine();
@@ -98,6 +102,7 @@ public class event {
 
             }
 
+            //Writing statistical results to the output file
             bufferedWriter.write("total number of L mouse clicks: " + allMouseLeft.size());
             bufferedWriter.newLine();
 

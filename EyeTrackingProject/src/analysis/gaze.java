@@ -33,7 +33,10 @@ import java.util.ArrayList;
  */
 
 public class gaze {
-	public static void processGaze(String inputFile, String outputFile, int interval) throws IOException{
+	/*
+       Overloaded method for gathering interval statistics or percentage statistics
+     */
+	public static void processGaze(String inputFile, String outputFile, double interval) throws IOException{
 		String line = null;
 		ArrayList<Object> allValidData = new ArrayList<Object>();
 
@@ -61,10 +64,10 @@ public class gaze {
 
 			}
 
-
-			String formatStr="%6d %18d %25f %20f %20f";
+             //Writing statistical results to the output file
+			String formatStr="%6.1f %18d %25f %20f %20f";
 			String result=String.format(formatStr,
-					(interval/1000)/60,
+					interval,
 					allValidData.size(),
 					getAverageOfLeft(allValidData),
 					getAverageOfRight(allValidData),
@@ -110,6 +113,7 @@ public class gaze {
               
             }
 
+			//Writing statistical results to the output file
 			int timestampSize=timestamps.size()-1;
 			Integer interval= timestamps.get(timestampSize);
 
