@@ -36,8 +36,9 @@ import java.util.ArrayList;
 public class event {
     /*
        Overloaded method for gathering interval statistics or percentage statistics
+        interval - double for .txt file     String for .csv file (will pass in participant name as interval)
      */
-    public static void processEvent(String inputFile, String outputFile, double interval) throws IOException {
+    public static void processEvent(String inputFile, String outputFile, String interval) throws IOException {
         String line = null;
         ArrayList<Object> allMouseLeft = new ArrayList<Object>();
 
@@ -60,13 +61,15 @@ public class event {
             }
 
             //Writing statistical results to the output file
-            String formatStr = "%6.1f %12d ";
+            //REMOVE "interval" for .csv files
+            String formatStr = "%6s,%12d, ";
             String result = String.format(formatStr,
                     interval,
                     allMouseLeft.size());
             bufferedWriter.write(result);
-            bufferedWriter.newLine();
 
+            //Add newline for .txt file
+          //  bufferedWriter.newLine();
 
             bufferedWriter.close();
             bufferedReader.close();
@@ -79,44 +82,6 @@ public class event {
         }
     }
 
-
-	public static void processEvent(String inputFile, String outputFile) throws IOException {
-
-
-        String line = null;
-        ArrayList<Object> allMouseLeft = new ArrayList<Object>();
-
-        FileWriter fileWriter = new FileWriter(outputFile);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-        try {
-            FileReader fileReader = new FileReader(inputFile);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while((line = bufferedReader.readLine()) != null && line.isEmpty()==false) {
-
-                String[] lineArray = fixation.lineToArray(line);
-
-                if(lineArray[1].equals("LMouseButton") && lineArray[2].equals("1")){
-                    allMouseLeft.add(lineArray);
-                }
-
-            }
-
-            //Writing statistical results to the output file
-            bufferedWriter.write("total number of L mouse clicks: " + allMouseLeft.size());
-            bufferedWriter.newLine();
-
-            bufferedWriter.close();
-            bufferedReader.close();
-
-            System.out.println("done writing event data to: " + outputFile);
-
-        }catch(FileNotFoundException ex) {
-            System.out.println("Unable to open file '" + inputFile + "'");
-        }catch(IOException ex) {
-            System.out.println("Error reading file '" + inputFile + "'");
-        }
-    }
 	
 }
 	

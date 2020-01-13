@@ -35,8 +35,9 @@ import java.util.ArrayList;
 public class gaze {
 	/*
        Overloaded method for gathering interval statistics or percentage statistics
+        interval - double for .txt file     String for .csv file (will pass in participant name as interval)
      */
-	public static void processGaze(String inputFile, String outputFile, double interval) throws IOException{
+	public static void processGaze(String inputFile, String outputFile, String interval) throws IOException{
 		String line = null;
 		ArrayList<Object> allValidData = new ArrayList<Object>();
 
@@ -65,7 +66,8 @@ public class gaze {
 			}
 
              //Writing statistical results to the output file
-			String formatStr="%6.1f %18d %25f %20f %20f";
+			//REMOVE "interval" for .csv files
+			String formatStr=" %6s,%18d, %25f, %20f, %20f,";
 			String result=String.format(formatStr,
 					interval,
 					allValidData.size(),
@@ -73,7 +75,10 @@ public class gaze {
 					getAverageOfRight(allValidData),
 					getAverageOfBoth(allValidData));
 			bufferedWriter.write(result);
+
+			//Always keep
 			bufferedWriter.newLine();
+
 			bufferedWriter.close();
 			bufferedReader.close();
 			System.out.println("done writing gaze data to: " + outputFile);
@@ -84,58 +89,7 @@ public class gaze {
 			System.out.println("Error reading file '" + inputFile + "'");
 		}
 	}
-	
-	public static void processGaze(String inputFile, String outputFile) throws IOException{
-		String line = null;
-        ArrayList<Object> allValidData = new ArrayList<Object>();
-        
-        FileWriter fileWriter = new FileWriter(outputFile,true);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        ArrayList<Integer> timestamps= new ArrayList<Integer>();
 
-        try {
-            FileReader fileReader = new FileReader(inputFile);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while((line = bufferedReader.readLine()) != null) {
-            	String[] lineArray = fixation.lineToArray(line);
-                timestamps.add(Integer.parseInt(lineArray[0]));
-                //checking the validity of the recording
-                //a code with 0 indicates the eye tracker was confident with this data
-                //note that only instances where BOTH pupil sizes are valid will be used in the analysis
-                if(lineArray[8].equals("0") && lineArray[15].equals("0")){
-                	double pupilLeft = Double.parseDouble(lineArray[7]);
-                	double pupilRight = Double.parseDouble(lineArray[14]);
-                	double[] pupilSizes = new double[2];
-                	pupilSizes[0] = pupilLeft;
-                	pupilSizes[1] = pupilRight;
-                	allValidData.add(pupilSizes);
-                }
-              
-            }
-
-			//Writing statistical results to the output file
-			int timestampSize=timestamps.size()-1;
-			Integer interval= timestamps.get(timestampSize);
-
-			String formatStr="%6d %18d %25f %20f %20f";
-			String result=String.format(formatStr,
-					(interval/1000)/60,
-					allValidData.size(),
-					getAverageOfLeft(allValidData),
-					getAverageOfRight(allValidData),
-					getAverageOfBoth(allValidData));
-			bufferedWriter.write(result);
-			bufferedWriter.newLine();
-			bufferedWriter.close();
-			bufferedReader.close();
-			System.out.println("done writing gaze data to: " + outputFile);
-		
-		}catch(FileNotFoundException ex) {
-	        System.out.println("Unable to open file '" + inputFile + "'");				
-	    }catch(IOException ex) {
-	        System.out.println("Error reading file '" + inputFile + "'");			
-	    }
-	}
 	
 	//calculate the average pupil size of the left eye
 	public static double getAverageOfLeft(ArrayList<Object> allValidData){

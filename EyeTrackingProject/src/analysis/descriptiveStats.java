@@ -79,8 +79,10 @@ public class descriptiveStats {
 		int middle = allIntegers.size()/2;
 		if(allIntegers.size()%2 == 1){
 			return allIntegers.get(middle);
-		}else{
+		}else if (allIntegers.size()%2 == 0 && allIntegers.size()>0){
 			return (allIntegers.get(middle-1) + allIntegers.get(middle))/2.0; 
+		}else{
+			return 0.0;
 		}
 	}
 	
@@ -89,8 +91,10 @@ public class descriptiveStats {
 		int middle = allDoubles.size()/2;
 		if(allDoubles.size()%2 == 1){
 			return allDoubles.get(middle);
-		}else{
+		}else if(allDoubles.size()%2 == 0 && allDoubles.size()>0){
 			return (allDoubles.get(middle-1) + allDoubles.get(middle))/2.0;
+		}else{
+			return 0.0;
 		}
 	}
 	
@@ -98,8 +102,10 @@ public class descriptiveStats {
 		Arrays.sort(allDoubles);
 		if (allDoubles.length%2 == 1){
 			return (double) allDoubles[allDoubles.length/2];
-		}else{
+		}else if (allDoubles.length%2 == 0 && allDoubles.length>0){
 			return ((double)allDoubles[allDoubles.length/2] + (double)allDoubles[allDoubles.length/2+1])/2;
+		}else{
+			return 0.0;
 		}
 		
 	}
@@ -136,27 +142,52 @@ public class descriptiveStats {
 	}
 	
 	public static double getMinOfIntegers(ArrayList<Integer> allIntegers){
-		return Collections.min(allIntegers);
+		if(allIntegers.size()>0) {
+			return Collections.min(allIntegers);
+		}else{
+			return 0.0;
+		}
 	}
 	
 	public static double getMinOfDoubles(ArrayList<Double> allDoubles){
-		return Collections.min(allDoubles);
+		if(allDoubles.size()>0) {
+			return Collections.min(allDoubles);
+		}else{
+			return 0.0;
+		}
 	}
 	
 	public static double getMin(Double[] allDoubles){
-		return Collections.min(Arrays.asList(allDoubles));
+		if(allDoubles.length >0) {
+			return Collections.min(Arrays.asList(allDoubles));
+		}else{
+			return 0.0;
+		}
 	}
 	
 	public static double getMaxOfIntegers(ArrayList<Integer> allIntegers){
-		return Collections.max(allIntegers);
+		if(allIntegers.size() > 0) {
+			return Collections.max(allIntegers);
+		}else{
+			return 0.0;
+		}
 	}
 	
 	public static double getMaxOfDoubles(ArrayList<Double> allDoubles){
-		return Collections.max(allDoubles);
+		if(allDoubles.size() >0) {
+			return Collections.max(allDoubles);
+		}else{
+			return 0.0;
+		}
 	}
 	
 	public static double getMax(Double[] allDoubles){
-		return Collections.max(Arrays.asList(allDoubles));
+		if(allDoubles.length >0) {
+			return Collections.max(Arrays.asList(allDoubles));
+		}else{
+			return 0.0;
+		}
+
 	}
 
 }

@@ -30,7 +30,7 @@ import java.util.Scanner;
 
 public class main {
     /**
-     * This method is used to get the input file to read from and the
+     * This method is used to get the input file to /read from and the
      * output files to write to;
      * @param args
      * @throws IOException
@@ -41,12 +41,12 @@ public class main {
 		//specify the location of the raw data files
 		String inputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Participant Data\\";
 		//specify the location of the analyzed results 
-		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Percentage Results\\";
+		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\";
 		//specify the subject, e.g. p1, as analysis is generated per-participant
-		String participant = "p36";
+		String participant = "p1";
 		
 		String inputLocation = inputURL + participant + "\\";
-		String outputLocation = outputURL + participant + "\\";
+		String outputLocation = outputURL + participant+"\\";
 		
 		//FXD data
 		//testing cases where X axis values are the same
@@ -78,28 +78,36 @@ public class main {
         String graphGazeInput = inputLocation + graphGaze;
 
         //Baseline Output files
-        String baselineOutput=outputLocation+"baseline";
+        //For .txt output files - outputLocation + participant + "_filetype_"
+        //For .csv output files - outputLocation + "filetype_"
+
+        String baselineOutput=outputLocation + "baseline_";
+
         //Tree output files
-        String treeOutput=outputLocation+"tree";
+        String treeOutput=outputLocation +"tree_";
 
         //Graph output files
-        String graphOutput=outputLocation+"graph";
+        String graphOutput=outputLocation +"graph_";
 
 
          Scanner in = new Scanner(System.in);
 
-         //analyze gaze baseline
-       percentageStats.getGZDStats(baselineInput,baselineOutput);
+         //i) Percentage Results - use percentageStats.methodName
+        //ii) Time Results - use intervalStats.methodName
+        //iii) For .csv, add third parameter participant to each call
 
-       //analyze tree related data
-          percentageStats.getFXDStats(treeFixationInput, treeOutput);
-          percentageStats.getEVDStats(treeEventInput, treeOutput);
-          percentageStats.getGZDStats(treeGazeInput, treeOutput);
+         //analyze gaze baseline
+//        intervalStats.getGZDStats(baselineInput,baselineOutput, participant);
+//
+//       //analyze tree related data
+        intervalStats.getFXDStats(treeFixationInput, treeOutput, participant);
+        intervalStats.getEVDStats(treeEventInput, treeOutput, participant);
+        intervalStats.getGZDStats(treeGazeInput, treeOutput, participant);
 //
 //        //analyze graph related data
-          percentageStats.getFXDStats(graphFixationInput, graphOutput);
-          percentageStats.getEVDStats(graphEventInput, graphOutput);
-          percentageStats.getGZDStats(graphGazeInput, graphOutput);
+        intervalStats.getFXDStats(graphFixationInput, graphOutput, participant);
+        intervalStats.getEVDStats(graphEventInput, graphOutput, participant);
+        intervalStats.getGZDStats(graphGazeInput, graphOutput, participant);
 	}
 
 }
