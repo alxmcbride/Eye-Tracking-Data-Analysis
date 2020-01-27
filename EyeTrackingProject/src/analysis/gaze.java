@@ -37,7 +37,7 @@ public class gaze {
        Overloaded method for gathering interval statistics or percentage statistics
         interval - double for .txt file     String for .csv file (will pass in participant name as interval)
      */
-	public static void processGaze(String inputFile, String outputFile, String interval) throws IOException{
+	public static void processGaze(String inputFile, String outputFile) throws IOException{
 		String line = null;
 		ArrayList<Object> allValidData = new ArrayList<Object>();
 
@@ -67,14 +67,16 @@ public class gaze {
 
              //Writing statistical results to the output file
 			//REMOVE "interval" for .csv files
-			String formatStr=" %6s,%18d, %25f, %20f, %20f,";
+			String formatStr=" %25f, %20f,%20f,";
 			String result=String.format(formatStr,
-					interval,
-					allValidData.size(),
 					getAverageOfLeft(allValidData),
 					getAverageOfRight(allValidData),
 					getAverageOfBoth(allValidData));
 			bufferedWriter.write(result);
+
+			/* Missing stats
+			    	allValidData.size(),
+			 */
 
 			//Always keep
 			bufferedWriter.newLine();

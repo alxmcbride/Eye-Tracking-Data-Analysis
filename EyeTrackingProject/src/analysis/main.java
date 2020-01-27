@@ -41,12 +41,12 @@ public class main {
 		//specify the location of the raw data files
 		String inputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Participant Data\\";
 		//specify the location of the analyzed results 
-		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Interval Results\\";
+		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\CSV files\\";
 		//specify the subject, e.g. p1, as analysis is generated per-participant
-		String participant = "p1";
+		String participant = "p36";
 		
 		String inputLocation = inputURL + participant + "\\";
-		String outputLocation = outputURL + participant+"\\";
+		String outputLocation = outputURL ;
 		
 		//FXD data
 		//testing cases where X axis values are the same
@@ -79,15 +79,15 @@ public class main {
 
         //Baseline Output files
         //For .txt output files - outputLocation + participant + "_filetype_"
-        //For .csv output files - outputLocation + "filetype_"
+        //For .csv output files - outputLocation;
 
-        String baselineOutput=outputLocation + "baseline_";
+        String baselineOutput=outputLocation ;
 
         //Tree output files
-        String treeOutput=outputLocation +"tree_";
+        String treeOutput=outputLocation ;
 
         //Graph output files
-        String graphOutput=outputLocation +"graph_";
+        String graphOutput=outputLocation ;
 
 
          Scanner in = new Scanner(System.in);
@@ -100,14 +100,14 @@ public class main {
 //        intervalStats.getGZDStats(baselineInput,baselineOutput, participant);
 //
 //       //analyze tree related data
-        intervalStats.getFXDStats(treeFixationInput, treeOutput, participant);
-        intervalStats.getEVDStats(treeEventInput, treeOutput, participant);
-        intervalStats.getGZDStats(treeGazeInput, treeOutput, participant);
+        percent.getFXDStats(treeFixationInput, treeOutput, participant,"tree");
+           percent.getEVDStats(treeEventInput, treeOutput);
+        percent.getGZDStats(treeGazeInput, treeOutput);
 //
 //        //analyze graph related data
-        intervalStats.getFXDStats(graphFixationInput, graphOutput, participant);
-        intervalStats.getEVDStats(graphEventInput, graphOutput, participant);
-        intervalStats.getGZDStats(graphGazeInput, graphOutput, participant);
+          percent.getFXDStats(graphFixationInput, graphOutput, participant,"graph");
+           percent.getEVDStats(graphEventInput, graphOutput);
+           percent.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }

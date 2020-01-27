@@ -102,7 +102,10 @@ public class descriptiveStats {
 		Arrays.sort(allDoubles);
 		if (allDoubles.length%2 == 1){
 			return (double) allDoubles[allDoubles.length/2];
-		}else if (allDoubles.length%2 == 0 && allDoubles.length>0){
+		}else if (allDoubles.length%2 == 0 && allDoubles.length > 0){
+			if(allDoubles.length==2){
+				return ((double)allDoubles[0] + (double)allDoubles[1])/2;
+			}
 			return ((double)allDoubles[allDoubles.length/2] + (double)allDoubles[allDoubles.length/2+1])/2;
 		}else{
 			return 0.0;

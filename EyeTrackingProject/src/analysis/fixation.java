@@ -44,7 +44,8 @@ public class fixation {
         Overloaded method for gathering interval statistics or percentage statistics
         interval - double for .txt file     String for .csv file (will pass in participant name as interval)
       */
-    public static void processFixation(String inputFile, String outputFile, String interval) throws IOException{
+    public static void processFixation(String inputFile, String outputFile, String participant) throws IOException{
+
         String line = null;
         ArrayList<Integer> allFixationDurations = new ArrayList<Integer>();
         ArrayList<Object> allCoordinates = new ArrayList<Object>();
@@ -57,6 +58,8 @@ public class fixation {
         try {
             FileReader fileReader = new FileReader(inputFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+
             while((line = bufferedReader.readLine()) != null) {
 
                 String[] lineArray = lineToArray(line);
@@ -97,6 +100,7 @@ public class fixation {
             //getting saccade lengths
             Double[] allSaccadeLengths = saccade.getAllSaccadeLength(allCoordinates);
 
+
             //getting saccade durations
             ArrayList<Integer> allSaccadeDurations = saccade.getAllSaccadeDurations(saccadeDetails);
 
@@ -122,39 +126,35 @@ public class fixation {
 
 
 
-
             //Writing statistical results to the output file
-            String formatStr="%6s, %16d, %30f, %20f, %25f, %20f, %25f, %26f,  " +
-                    "%10d, %25f, %20f, %25f, %20f, %20f, %20f,"+
-                    "%25f, %20f, %25f, %25f, %17f, %22f,  " +
+            String formatStr="%6s, %16d, %30f, %20f, %25f, %20f,  " +
+                    "%10d, %25f, %20f, %25f, %20f,"+
+                    "%25f, %20f, %25f, %25f,   " +
                     "%17f, %17f,"+
-                    "%20f, %14f, %14f, %14f, %16f, %16f,"+
-                    "%17f, %13f, %17f, %13f, %20f, %17f, " +
+                    "%20f, %14f, %14f, %14f, "+
+                    "%17f, %13f, %17f, %13f, " +
                     "%18f,";
             String result=String.format(formatStr,
-                    interval,
+                    participant,
                     allFixationDurations.size(),
                     descriptiveStats.getSumOfIntegers(allFixationDurations),
                     descriptiveStats.getMeanOfIntegers(allFixationDurations),
                     descriptiveStats.getMedianOfIntegers(allFixationDurations),
                     descriptiveStats.getStDevOfIntegers(allFixationDurations),
-                    descriptiveStats.getMinOfIntegers(allFixationDurations),
-                    descriptiveStats.getMaxOfIntegers(allFixationDurations),
+
 
                     allSaccadeLengths.length,
                     descriptiveStats.getSum(allSaccadeLengths),
                     descriptiveStats.getMean(allSaccadeLengths),
                     descriptiveStats.getMedian(allSaccadeLengths),
                     descriptiveStats.getStDev(allSaccadeLengths),
-                    descriptiveStats.getMin(allSaccadeLengths),
-                    descriptiveStats.getMax(allSaccadeLengths),
+
 
                     descriptiveStats.getSumOfIntegers(allSaccadeDurations),
                     descriptiveStats.getMeanOfIntegers(allSaccadeDurations),
                     descriptiveStats.getMedianOfIntegers(allSaccadeDurations),
                     descriptiveStats.getStDevOfIntegers(allSaccadeDurations),
-                    descriptiveStats.getMinOfIntegers(allSaccadeDurations),
-                    descriptiveStats.getMaxOfIntegers(allSaccadeDurations),
+
 
                     getScanpathDuration(allFixationDurations, allSaccadeDurations),
                     getFixationToSaccadeRatio(allFixationDurations, allSaccadeDurations),
@@ -163,15 +163,13 @@ public class fixation {
                     descriptiveStats.getMeanOfDoubles(allAbsoluteDegrees),
                     descriptiveStats.getMedianOfDoubles(allAbsoluteDegrees),
                     descriptiveStats.getStDevOfDoubles(allAbsoluteDegrees),
-                    descriptiveStats.getMinOfDoubles(allAbsoluteDegrees),
-                    descriptiveStats.getMaxOfDoubles(allAbsoluteDegrees),
+
 
                     descriptiveStats.getSumOfDoubles(allRelativeDegrees),
                     descriptiveStats.getMeanOfDoubles(allRelativeDegrees),
                     descriptiveStats.getMedianOfDoubles(allRelativeDegrees),
                     descriptiveStats.getStDevOfDoubles(allRelativeDegrees),
-                    descriptiveStats.getMinOfDoubles(allRelativeDegrees),
-                    descriptiveStats.getMaxOfDoubles(allRelativeDegrees),
+
                     convexHull_result);
 
             bufferedWriter.write(result);
@@ -182,6 +180,19 @@ public class fixation {
             bufferedWriter.close();
             bufferedReader.close();
             System.out.println("done writing fixation data to: " + outputFile);
+
+            //Missing stats
+           /*       descriptiveStats.getMinOfIntegers(allFixationDurations),
+                    descriptiveStats.getMaxOfIntegers(allFixationDurations),
+                    descriptiveStats.getMin(allSaccadeLengths),
+                    descriptiveStats.getMax(allSaccadeLengths),
+                    descriptiveStats.getMinOfIntegers(allSaccadeDurations),
+                    descriptiveStats.getMaxOfIntegers(allSaccadeDurations),
+                    descriptiveStats.getMinOfDoubles(allAbsoluteDegrees),
+                    descriptiveStats.getMaxOfDoubles(allAbsoluteDegrees),
+                     descriptiveStats.getMinOfDoubles(allRelativeDegrees),
+                    descriptiveStats.getMaxOfDoubles(allRelativeDegrees),
+                    */
 
         }catch(FileNotFoundException ex) {
             System.out.println("Unable to open file '" + inputFile + "'");

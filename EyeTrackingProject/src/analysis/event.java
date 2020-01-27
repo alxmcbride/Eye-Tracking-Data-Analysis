@@ -38,7 +38,7 @@ public class event {
        Overloaded method for gathering interval statistics or percentage statistics
         interval - double for .txt file     String for .csv file (will pass in participant name as interval)
      */
-    public static void processEvent(String inputFile, String outputFile, String interval) throws IOException {
+    public static void processEvent(String inputFile, String outputFile) throws IOException {
         String line = null;
         ArrayList<Object> allMouseLeft = new ArrayList<Object>();
 
@@ -62,9 +62,8 @@ public class event {
 
             //Writing statistical results to the output file
             //REMOVE "interval" for .csv files
-            String formatStr = "%6s,%12d, ";
+            String formatStr = "%12d, ";
             String result = String.format(formatStr,
-                    interval,
                     allMouseLeft.size());
             bufferedWriter.write(result);
 
