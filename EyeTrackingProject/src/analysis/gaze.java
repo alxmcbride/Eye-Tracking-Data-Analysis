@@ -50,6 +50,8 @@ public class gaze {
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			while((line = bufferedReader.readLine()) != null) {
 				String[] lineArray = fixation.lineToArray(line);
+//				if(Integer.parseInt(lineArray[0]) < 60000)
+//				   System.out.println(lineArray[0]);
 				timestamps.add(Integer.parseInt(lineArray[0]));
 				//checking the validity of the recording
 				//a code with 0 indicates the eye tracker was confident with this data
@@ -61,7 +63,7 @@ public class gaze {
 					pupilSizes[0] = pupilLeft;
 					pupilSizes[1] = pupilRight;
 					allValidData.add(pupilSizes);
-				}
+				  }
 
 			}
 

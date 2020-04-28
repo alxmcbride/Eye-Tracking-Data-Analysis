@@ -41,12 +41,12 @@ public class main {
 		//specify the location of the raw data files
 		String inputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Participant Data\\";
 		//specify the location of the analyzed results 
-		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\CSV files\\";
+		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Test Folder\\";
 		//specify the subject, e.g. p1, as analysis is generated per-participant
-		String participant = "p36";
+		String participant = "p2";
 		
 		String inputLocation = inputURL + participant + "\\";
-		String outputLocation = outputURL ;
+		String outputLocation = outputURL;
 		
 		//FXD data
 		//testing cases where X axis values are the same
@@ -100,14 +100,14 @@ public class main {
 //        intervalStats.getGZDStats(baselineInput,baselineOutput, participant);
 //
 //       //analyze tree related data
-        percent.getFXDStats(treeFixationInput, treeOutput, participant,"tree");
-           percent.getEVDStats(treeEventInput, treeOutput);
-        percent.getGZDStats(treeGazeInput, treeOutput);
+         timeStats.getFXDStats(treeFixationInput, treeOutput, participant,"tree");
+         timeStats.getEVDStats(treeEventInput, treeOutput);
+         timeStats.getGZDStats(treeGazeInput, treeOutput);
 //
 //        //analyze graph related data
-          percent.getFXDStats(graphFixationInput, graphOutput, participant,"graph");
-           percent.getEVDStats(graphEventInput, graphOutput);
-           percent.getGZDStats(graphGazeInput, graphOutput);
+         timeStats.getFXDStats(graphFixationInput, graphOutput, participant,"graph");
+         timeStats.getEVDStats(graphEventInput, graphOutput);
+         timeStats.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }

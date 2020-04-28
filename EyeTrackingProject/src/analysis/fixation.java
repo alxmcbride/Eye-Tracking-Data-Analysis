@@ -61,7 +61,7 @@ public class fixation {
 
 
             while((line = bufferedReader.readLine()) != null) {
-
+               // System.out.println(line);
                 String[] lineArray = lineToArray(line);
 
                 //get each fixation's duration
@@ -81,7 +81,7 @@ public class fixation {
                 eachCoordinate[1] = y;
 
                 //get timestamp of each fixation
-                int timestamp = Integer.parseInt(lineArray[1]);
+                int timestamp = Integer.parseInt(lineArray[1]);            
                 Integer[] eachSaccadeDetail = new Integer[2];
                 eachSaccadeDetail[0] = timestamp;
                 eachSaccadeDetail[1] = eachDuration;

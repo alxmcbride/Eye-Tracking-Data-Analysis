@@ -55,6 +55,7 @@ public class event {
 
 
                 if (lineArray[1].equals("LMouseButton") && lineArray[2].equals("1")) {
+                	System.out.println(line);
                     allMouseLeft.add(lineArray);
                 }
 
