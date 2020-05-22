@@ -5,23 +5,29 @@ import java.util.ArrayList;
 
 /**
  * This class is used to gathers statistics for a set percentage of lines. Given are two options of how to gather them:
- *      1) Expanding Window Interval (EXP)
+ *      1) Expanding Window Interval - uses windowSizeWholePercent, windowSizeDecimalPercent
  *        This option allows for processing a set of raw data for a set percentage of lines, then adds to it the set of raw data for the same percentage of lines
  *       to be processed all together, and continues so forth until the end of the raw data file.
  *
- *      2) Tumbling Window Interval
+ *      2) Tumbling Window Interval - uses windowSizeWholePercent, windowSizeDecimalPercent
  *         This option allows for processing a set percentage of lines, then processes the next set a set percentage of lines
  *         separately from the previous set, and continues so forth until the end of the raw data file.
  *         
- *    This code will generate results in either a .csv or a .txt
- *
+ *      3) Hopping Window - uses windowSizeWholePercent, windowSizeDecimalPercent, hopsizeWholePercent, hopsizeDecimalPercent
+ *         This option allows for processing a set of lines every hopSizeWholePercent that have occurred within the last 
+ *         windowSizeWholePercent. Example: hopsizeWholePercent = 5%, windowSizeInMinutes = 10% -> every 5% of lines, process lines
+ *         that are within the last 10% of lines.
+ *         
+ *       4) Session Window - - uses windowSizeWholePercent, windowSizeDecimalPercent, maxDuration, maxDurationWholePercent, windowTimestamps
+ *         
+ *         
  */
 
 public class percentageStats {
 
-    private static double windowSizeWholePercent = 5.0; // <---ENTER THE PERCENTAGE HERE
+    private static double windowSizeWholePercent = 10.0; // <---ENTER THE PERCENTAGE HERE
     private static double windowSizeDecimalPercent= windowSizeWholePercent/100;
-    private static String percentageStatsType = "SES";  //<----- ENTER: "TBM" for Tumbling Window Percentage Statistics
+    private static String percentageStatsType = "HOP";  //<----- ENTER: "TBM" for Tumbling Window Percentage Statistics
                                                                      // "EXP" for Expanding Window Percentage Statistics
                                                                      // "HOP" for Hopping Window Percentage Statistics
     // Used for Hopping Window Option ONLY
@@ -85,7 +91,7 @@ public class percentageStats {
 
         if(participant.equals("p1") && visualType.equals("tree")) {
             while(temp_percent <= 100.0) {
-                fileWriter = new FileWriter(outputFile + "_" + (int) temp_percent + ".csv");
+                fileWriter = new FileWriter(outputFile + "_" + (int) temp_percent + "%.csv"); //remove percent for SES
                 bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write(String.format(formatFieldNames,
                         "participant", "total fixation duration", "sum fixation duration", "mean fixation duration", "median fixation duration", "SD fixation duration"
@@ -215,13 +221,12 @@ public class percentageStats {
             
 
 
-        //    while (stoppingPoint <= 1.0 || endIndex <= lines.size()-1) {
+            if(percentageStatsType.equals("SES")) {
                 for (int i = startIndex; i < lines.size(); i++) {
                     //If point is found, will go on and process up to intervalToBeProcessed
                     String [] lineArray = fixation.lineToArray(lines.get(i));
                     int timestamp = Integer.parseInt(lineArray[1]);
                     int fixationDuration = Integer.parseInt(lineArray[2]);
-                	if(percentageStatsType.equals("SES")) {
                 		if(fixationDuration > avgFixationDuration) {
                 			if(windowEndFound) {
                 				if (i >  endIndex) {
@@ -275,21 +280,22 @@ public class percentageStats {
                             windowEndFound = false;
                             isLastEvent = false;
                             fileCount++;
+                           }
                          }
-                       }else{
-                        endIndex = i;      
+                     }else{
+                    	  endIndex = startIndex + (numOfLines-1);
+                          while(stoppingPoint <= 1.0 ) {
+                            tempFileWriter = new FileWriter(tempURL);
+                            tempBufferedWriter = new BufferedWriter(tempFileWriter);
+                            for (int j = startIndex; j <= endIndex; j++) {
+                              tempBufferedWriter.write(lines.get(j));
+                              tempBufferedWriter.newLine();
+                            }
+                           tempBufferedWriter.close();
+                           fixation.processFixation(tempURL, outputFile + "_" + percent + "%.csv", participant);
                         
-                        tempFileWriter = new FileWriter(tempURL);
-                        tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                        for (int j = startIndex; j <= endIndex; j++) {
-                            tempBufferedWriter.write(lines.get(j));
-                            tempBufferedWriter.newLine();
-                        }
-                        tempBufferedWriter.close();
-                        fixation.processFixation(tempURL, outputFile + "_" + percent + "%%.csv", participant);
-                       
                         if(percentageStatsType.equals("HOP")){
-                            if( stoppingPoint < windowSizeDecimalPercent){
+                            if(stoppingPoint < windowSizeDecimalPercent){
                                 nextStartIndex= endIndex+1;
                             }else {
                                 startIndex = nextStartIndex;
@@ -304,15 +310,16 @@ public class percentageStats {
                         if(percentageStatsType.equals("HOP")) {
                             stoppingPoint += hopsizeDecimalPercent;
                             percent += hopsizeWholePercent;
+                           
                         }else{
                             stoppingPoint += windowSizeDecimalPercent;
                             percent+= windowSizeWholePercent;
                         }
-                        numOfLines = (int) Math.floor(totalLines * stoppingPoint);
 
-                    }
-                 }
-              
+                        endIndex += (numOfLines-1);
+                      }
+                  }
+                
             //Deleting temp file
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
@@ -376,7 +383,7 @@ public class percentageStats {
             //SESSION WINDOW ONLY
             int windowEndTimestampCount = 0;
             int fileCount = 1;
-            double window =  windowTimestamps.get(windowEndTimestampCount);
+          //  double window =  windowTimestamps.get(windowEndTimestampCount);
             
             //Keeping track of current time interval stopping point
             double stoppingPoint;
@@ -385,7 +392,7 @@ public class percentageStats {
             }else if (percentageStatsType.equals("SES")){
             	stoppingPoint = windowTimestamps.get(windowEndTimestampCount);
             }else{
-                stoppingPoint = (int)windowSizeDecimalPercent;
+                stoppingPoint = windowSizeDecimalPercent;
             }
 
             double percent;
@@ -397,9 +404,7 @@ public class percentageStats {
             
             //Getting the number of lines read
             int totalLines = lines.size();
-
-            int numOfLines = (int) Math.floor(totalLines * stoppingPoint)-1;
-
+            int numOfLines = (int) Math.floor(totalLines * stoppingPoint);
             int value = 0;
             //SESSION WINDOW: gathers data based on timestamps
             if(percentageStatsType.equals("SES")) {
@@ -434,47 +439,41 @@ public class percentageStats {
             	
             	//OTHER WINDOW TYPES
            }else {
-             while (stoppingPoint <= 1.0) {
-                for (int i = startIndex; i < lines.size(); i++) {
-                    //If point is found, will go on and process up to intervalToBeProcessed
-                       if (i == numOfLines-1) {
-                         endIndex = i;
-                        tempFileWriter = new FileWriter(tempURL);
-                        tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                        for (int j = startIndex; j <= endIndex; j++) {
-                            tempBufferedWriter.write(lines.get(j));
-                            tempBufferedWriter.newLine();
-                        }
-                        tempBufferedWriter.close();
-                        gaze.processGaze(tempURL, outputFile + "_" + percent + "%%.csv");
-                        
-                        if(percentageStatsType.equals("HOP")){
-                            if( stoppingPoint < windowSizeDecimalPercent){
-                                nextStartIndex= endIndex+1;
-                            }else {
-                                startIndex = nextStartIndex;
-                                nextStartIndex = endIndex + 1;
-                            }
-                        }
-                        //if tumbling window, will update the start index to not include previous lines processed
-                        else if(percentageStatsType.equals("TBM")){
-                            startIndex=endIndex+1;
-                        }
+           	endIndex = startIndex + (numOfLines-1);
+            while(stoppingPoint <= 1.0 ) {
+              tempFileWriter = new FileWriter(tempURL);
+              tempBufferedWriter = new BufferedWriter(tempFileWriter);
+              for (int j = startIndex; j <= endIndex; j++) {
+                tempBufferedWriter.write(lines.get(j));
+                tempBufferedWriter.newLine();
+              }
+             tempBufferedWriter.close();
+             gaze.processGaze(tempURL, outputFile + "_" + percent + "%.csv");
+          
+          if(percentageStatsType.equals("HOP")){
+              if(stoppingPoint < windowSizeDecimalPercent){
+                  nextStartIndex= endIndex+1;
+              }else {
+                  startIndex = nextStartIndex;
+                  nextStartIndex = endIndex + 1;
+              }
+          }
+          //if tumbling window, will update the start index to not include previous lines processed
+          else if(percentageStatsType.equals("TBM")){
+              startIndex=endIndex+1;
+          }
+          //Update the stopping point and interval to be processed
+          if(percentageStatsType.equals("HOP")) {
+              stoppingPoint += hopsizeDecimalPercent;
+              percent += hopsizeWholePercent;
+             
+          }else{
+              stoppingPoint += windowSizeDecimalPercent;
+              percent+= windowSizeWholePercent;
+          }
 
-                        //Update the stopping point and interval to be processed
-                        
-                        if(percentageStatsType.equals("HOP")) {
-                            stoppingPoint += hopsizeDecimalPercent;
-                            percent += hopsizeWholePercent;
-                        }else{
-                            stoppingPoint += windowSizeDecimalPercent;
-                            percent+= windowSizeWholePercent;
-                        }
-                        numOfLines = (int) Math.floor(totalLines * stoppingPoint);
-
-                    }
-                }
-            }
+          endIndex += (numOfLines-1);
+          }
           }
             //Deleting temp file
             windowTimestamps.clear();
@@ -503,6 +502,7 @@ public class percentageStats {
             System.out.println(percentageStatsType+" is not an statistics option");
             return;
         }
+        
 
         //Writer for temporary file
         String tempURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\tempFile.txt";
@@ -541,7 +541,7 @@ public class percentageStats {
             //SESSION WINDOW ONLY
             int windowEndTimestampCount = 0;
             int fileCount = 1;
-            double window =  windowTimestamps.get(windowEndTimestampCount);
+            //double window =  windowTimestamps.get(windowEndTimestampCount);  UNCOMMENT OUT FOR SES WINDOWS 
             
             
             //Keeping track of current time interval stopping point
@@ -551,7 +551,7 @@ public class percentageStats {
             }else if (percentageStatsType.equals("SES")){
             	stoppingPoint = windowTimestamps.get(windowEndTimestampCount);
             }else{
-                stoppingPoint = (int)windowSizeDecimalPercent;
+                stoppingPoint = windowSizeDecimalPercent;
             }
 
             double percent;
@@ -563,11 +563,7 @@ public class percentageStats {
             
             //Getting the number of lines read
             int totalLines = lines.size();
-
-            int numOfLines = (int) Math.floor(totalLines * stoppingPoint)-1;
-            
-            
-
+            int numOfLines = (int) Math.floor(totalLines * stoppingPoint);
             int value = 0;
             
             //SESSION WINDOW: gathers data based on timestamps
@@ -602,47 +598,41 @@ public class percentageStats {
             	}    
             
             	//OTHER WINDOW TYPES
-            }else {  
-            while (stoppingPoint <= 1.0) {
-                for (int i = startIndex; i < lines.size(); i++) {
-                    //If point is found, will go on and process up to intervalToBeProcessed
-                    if (i == numOfLines-1) {
-                        endIndex = i;
-                        tempFileWriter = new FileWriter(tempURL);
-                        tempBufferedWriter = new BufferedWriter(tempFileWriter);
-                        for (int j = startIndex; j <= endIndex; j++) {
-                            tempBufferedWriter.write(lines.get(j));
-                            tempBufferedWriter.newLine();
-                        }
-                        tempBufferedWriter.close();
-                        event.processEvent(tempURL, outputFile+"_"+percent+"%%.csv");
-                        if(percentageStatsType.equals("HOP")){
-                            if( stoppingPoint < windowSizeDecimalPercent){
-                                nextStartIndex= endIndex+1;
-                            }else {
-                                startIndex = nextStartIndex;
-                                nextStartIndex = endIndex + 1;
-                            }
-                        }
-                        //if tumbling window, will update the start index to not include previous lines processed
-                        else if(percentageStatsType.equals("TBM")){
-                            startIndex=endIndex+1;
-                        }
+            }else {
+            	endIndex = startIndex + (numOfLines-1);
+                  while(stoppingPoint <= 1.0 ) {
+                  tempFileWriter = new FileWriter(tempURL);
+                  tempBufferedWriter = new BufferedWriter(tempFileWriter);
+                  for (int j = startIndex; j <= endIndex; j++) {
+                    tempBufferedWriter.write(lines.get(j));
+                    tempBufferedWriter.newLine();
+                  }
+                 tempBufferedWriter.close();
+                 event.processEvent(tempURL, outputFile + "_" + percent + "%.csv");
+              
+              if(percentageStatsType.equals("HOP")){
+                  if(stoppingPoint < windowSizeDecimalPercent){
+                      nextStartIndex= endIndex+1;
+                  }else {
+                      startIndex = nextStartIndex;
+                      nextStartIndex = endIndex + 1;
+                  }
+              }
+              //if tumbling window, will update the start index to not include previous lines processed
+              else if(percentageStatsType.equals("TBM")){
+                  startIndex=endIndex+1;
+              }
+              //Update the stopping point and interval to be processed
+              if(percentageStatsType.equals("HOP")) {
+                  stoppingPoint += hopsizeDecimalPercent;
+                  percent += hopsizeWholePercent;
+                 
+              }else{
+                  stoppingPoint += windowSizeDecimalPercent;
+                  percent+= windowSizeWholePercent;
+              }
 
-
-
-                        //Update the stopping point and interval to be processed
-                        if(percentageStatsType.equals("HOP")) {
-                            stoppingPoint += hopsizeDecimalPercent;
-                            percent += hopsizeWholePercent;
-                        }else{
-                            stoppingPoint += windowSizeDecimalPercent;
-                            percent+= windowSizeWholePercent;
-                        }
-                        numOfLines = (int) Math.floor(totalLines * stoppingPoint);
-
-                    }
-                }
+              endIndex += (numOfLines-1);
               }
             }
 
@@ -659,7 +649,7 @@ public class percentageStats {
 
     }
 
-    /* -----------------------------------------GENERATING .TXT FILES---------------------------------------*/
+    /* -----------------------------------------GENERATING .TXT FILES (OLD) ---------------------------------------*/
 
 //    public static void getFXDStats(String inputFile, String outputFile) throws IOException {
 //        //Setting i) file name based on stats type and ii) the file extension

@@ -43,7 +43,7 @@ public class main {
 		//specify the location of the analyzed results 
 		String outputURL = "C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Test Folder\\";
 		//specify the subject, e.g. p1, as analysis is generated per-participant
-		String participant = "p2";
+		String participant = "p1";
 		
 		String inputLocation = inputURL + participant + "\\";
 		String outputLocation = outputURL;
@@ -100,14 +100,14 @@ public class main {
 //        intervalStats.getGZDStats(baselineInput,baselineOutput, participant);
 //
 //       //analyze tree related data
-         timeStats.getFXDStats(treeFixationInput, treeOutput, participant,"tree");
-         timeStats.getEVDStats(treeEventInput, treeOutput);
-         timeStats.getGZDStats(treeGazeInput, treeOutput);
+         percentageStats.getFXDStats(treeFixationInput, treeOutput, participant,"tree");
+         percentageStats.getEVDStats(treeEventInput, treeOutput);
+         percentageStats.getGZDStats(treeGazeInput, treeOutput);
 //
 //        //analyze graph related data
-         timeStats.getFXDStats(graphFixationInput, graphOutput, participant,"graph");
-         timeStats.getEVDStats(graphEventInput, graphOutput);
-         timeStats.getGZDStats(graphGazeInput, graphOutput);
+         percentageStats.getFXDStats(graphFixationInput, graphOutput, participant,"graph");
+         percentageStats.getEVDStats(graphEventInput, graphOutput);
+         percentageStats.getGZDStats(graphGazeInput, graphOutput);
 	}
 
 }

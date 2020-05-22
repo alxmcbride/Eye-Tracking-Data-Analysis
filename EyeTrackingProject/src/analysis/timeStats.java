@@ -2,25 +2,46 @@ package analysis;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * This class is used to gathers statistics for a window of lines that is set by windowSizeInMinutes, which a set amount of time
+ * Given are four options of how to gather them:
+ * 
+ *      1) Expanding Window - uses windowSizeInMinutes, windowSizeInMilliseconds
+ *         This option allows for processing a set of raw data for a set percentag of lines, 
+ *         then adds to it the set of raw data for the same percentage of lines to be processed 
+ *         all together, and continues so forth until the end of the raw data file.
+ *
+ *      2) Tumbling Window - uses windowSizeInMinutes, windowSizeInMilliseconds
+ *         This option allows for processing a set percentage of lines, then processes the next set a set percentage of lines
+ *         separately from the previous set, and continues so forth until the end of the raw data file.
+ *         
+ *      3) Hopping Window - uses windowSizeInMinutes, windowSizeInMilliseconds, hopsizeInMinutes, hopsizeInMilliseconds 
+ *         This option allows for processing a set of lines every hopSizeInMinutes that have occured within the last 
+ *         windowSizeInMinutes. Example: hopsizeInMinutes = 1min, windowSizeInMinutes = 2min -> every minute, process lines
+ *         that are within the last two minutes.
+ *       
+ *      4) Session Window - uses windowSizeInMinutes, windowSizeInMilliseconds, maxDuration, maxDurationInMilliseconds, windowTimestamps
+
+ *         
+ *    This code will generate results in a .csv file 
+ */
+
 public class timeStats {
 	
-	private static String timeStatsType = "SES";  //<----- ENTER:     "EXP" for Expanding Window Interval Stats
-      // "TBM" for Tumbling Window Interval Stats
-      // "HOP" for Hopping Window Interval Stats
-      // "SES" for Session Window Interval Stats
 	  
     private static int windowSizeInMinutes = 2; // <---ENTER THE MINUTES HERE
     private static int windowSizeInMilliseconds = windowSizeInMinutes * 60 * 1000; //Converting minutes to milliseconds
-
-    // THESE ARE USED FOR HOPPING WINDOW ONLY
+    private static String timeStatsType = "SES";  //<----- ENTER: "TBM" for Tumbling Window Time Statistics
+                                                               // "EXP" for Expanding Window Time Statistics
+                                                               // "HOP" for Hopping Window Time Statistics
+ 
     private static int hopsizeInMinutes = 1; // <---ENTER THE MINUTES HERE
     private static int hopsizeInMilliseconds = hopsizeInMinutes * 60 * 1000; //Converting minutes to milliseconds
     
     
-    //THESE ARE USED FOR SESSION WINDOW ONLY
     private static int maxDuration = 5;     // <----ENTER THE MAXIMUM WINDOW DURATION HERE
     private static int maxDurationInMilliseconds = maxDuration * 60 * 1000;
-    private static ArrayList<Integer> windowTimestamps = new ArrayList<Integer>(); //stores timestamps for gaze, event data
+    private static ArrayList<Integer> windowTimestamps = new ArrayList<Integer>(); //stores timestamps for processing gaze, event data
 
   //-----------------------------------GENERATING .CSV FILES---------------------------------------------------
 
@@ -65,7 +86,7 @@ public class timeStats {
             while(temp_time<=24) {
             
             	//NAMING FOR OUTPUT .CSV FILES
-                fileWriter = new FileWriter(outputFile + "_" + temp_time + ".csv");  //remove mins for SESSION WINDOW
+                fileWriter = new FileWriter(outputFile + "_" + temp_time + "mins.csv");  //remove mins for SESSION WINDOW, then add back
                 
                 bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write(String.format(formatFieldNames,
@@ -195,6 +216,7 @@ public class timeStats {
             
            
             //Processing the raw data files
+           
             for(int i=endIndex+1;i<lines.size();i++){
                 //Looking for the point where the interval ends
                 String [] lineArray = fixation.lineToArray(lines.get(i));
@@ -266,8 +288,8 @@ public class timeStats {
                         }
                        tempBufferedWriter.close();
                        fixation.processFixation(tempURL, outputFile+"_"+(windowToBeProcessed/1000/60)+"mins.csv",participant);
-                    }
-                }
+                    
+                
                 
             
 
@@ -299,7 +321,9 @@ public class timeStats {
                         stoppingPoint += windowSizeInMilliseconds;
                         windowToBeProcessed += windowSizeInMilliseconds;
                     }
+                  }
                 }
+              }
             }
          
         
@@ -374,16 +398,18 @@ public class timeStats {
                     lines.add(line);
                 }
             }
-            
+            bufferedReader.close();
+
             
             //Initialize Variables
             int startIndex=0;   //Will change from zero ONLY when gathering tumbling window or hopping window stats
             int endIndex = 0;
             int stoppingPoint = 0;
+            int windowToBeProcessed;
             
             //FOR HOPPING WINDOW ONLY
             int nextStartIndex=0;
-            int windowToBeProcessed;
+         
 
             //FOR SESSION WINDOW ONLY
             int windowEndTimestampCount = 0;
@@ -416,14 +442,15 @@ public class timeStats {
 
             }
             
+            //For Hopping Window only
+            windowToBeProcessed = stoppingPoint;
+            
            
             //Holding for the interval to be currently processed
             
             //Looking to find the endpoint for the next interval after the current to be processed
             if(timeStatsType.equals("HOP")){
                 stoppingPoint += hopsizeInMilliseconds;
-            }else if(timeStatsType.equals("SES")){
-                 stoppingPoint = windowTimestamps.get(windowEndTimestampCount);
             }else{
                 stoppingPoint += windowSizeInMilliseconds;
             }
@@ -431,9 +458,7 @@ public class timeStats {
           
 
 
-            //For Hopping Window only
-            windowToBeProcessed = stoppingPoint;
-            
+
             int value = 0;
             
             //SESSION WINDOW: gathers data based on timestamps
@@ -485,7 +510,7 @@ public class timeStats {
             	
             	//OTHER WINDOW TYPES
            }else {
-            for (int i = endIndex + 1; i < lines.size(); i++) {
+              for (int i = endIndex + 1; i < lines.size(); i++) {
                 //Looking for the point where the interval ends
                 String[] lineArray = fixation.lineToArray(lines.get(i));
                 int timestamp = Integer.parseInt(lineArray[0]);
@@ -497,9 +522,9 @@ public class timeStats {
                         tempBufferedWriter.write(lines.get(j));
                         tempBufferedWriter.newLine();
                     }
-                    tempBufferedWriter.close();
+                      tempBufferedWriter.close();
                       gaze.processGaze(tempURL, outputFile + "_" + (windowToBeProcessed / 1000 / 60) + "mins.csv");
-                    }
+                    
                     if (timeStatsType.equals("HOP")) {
                         if (windowToBeProcessed < windowSizeInMilliseconds) {
                             nextStartIndex = endIndex + 1;
@@ -527,6 +552,7 @@ public class timeStats {
                         stoppingPoint += windowSizeInMilliseconds;
                         windowToBeProcessed += windowSizeInMilliseconds;
                     }
+                  }
                 }
             
 
@@ -606,10 +632,11 @@ public class timeStats {
             int startIndex=0;   //Will change from zero ONLY when gathering tumbling window or hopping window stats
             int endIndex = 0;
             int stoppingPoint;
+            int windowToBeProcessed;
             
             //FOR HOPPING WINDOW ONLY
             int nextStartIndex=0;
-            int windowToBeProcessed;
+          
 
             //FOR SESSION WINDOW ONLY
             int windowEndTimestampCount = 0;
@@ -760,8 +787,7 @@ public class timeStats {
             //Deleting temp file
             File tempFile = new File(tempURL);
             tempFile.deleteOnExit();
-            bufferedReader.close();
-
+       
         } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + inputFile + "'");
         } catch (IOException ex) {
@@ -771,7 +797,7 @@ public class timeStats {
 
 }
 
-//public static void getFXDStats(String inputFile, String outputFile) throws IOException {
+//public static void getFXDStatsTXT(String inputFile, String outputFile) throws IOException {
 //if (intervalStatsType.equals("TBM")) {
 //  outputFile = outputFile + "TBM_window_time_FXD_Results.txt";
 //} else if (intervalStatsType.equals("EXP")) {
@@ -928,13 +954,13 @@ public class timeStats {
 //
 //
 //
-//public static void getGZDStats(String inputFile, String outputFile) throws IOException{
+//public static void getGZDStatsTXT(String inputFile, String outputFile) throws IOException{
 ////Setting i) file name based on stats type and ii) the file extension
-//if (intervalStatsType.equals("TBM")) {
+//if (timeStatsType.equals("TBM")) {
 //  outputFile = outputFile + "TBM_window_time_GZD_Results.txt";
-//} else if (intervalStatsType.equals("EXP")) {
+//} else if (timeStatsType.equals("EXP")) {
 //  outputFile = outputFile + "EXP_window_time_GZD_Results.txt";
-//}else if (intervalStatsType.equals("HOP")) {
+//}else if (timeStatsType.equals("HOP")) {
 //  outputFile = outputFile + "HOP_window_time_GZD_Results.txt";
 //}else{
 //  System.out.println(intervalStatsType+"is not an statistics option");
@@ -1064,7 +1090,7 @@ public class timeStats {
 //}
 //}
 //
-//public static void getEVDStats(String inputFile, String outputFile) throws IOException{
+//public static void getEVDStatsTXT(String inputFile, String outputFile) throws IOException{
 //
 ////Setting i) file name based on stats type and ii) the file extension
 //

@@ -61,7 +61,6 @@ public class fixation {
 
 
             while((line = bufferedReader.readLine()) != null) {
-               // System.out.println(line);
                 String[] lineArray = lineToArray(line);
 
                 //get each fixation's duration

@@ -43,9 +43,9 @@ public class Converter {
 	  public static void main(String[] args)
 	  {
 	    Converter.convertCSVtoARFF("C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Feature Set\\Session Window FS CSV"
-	    		+ "\\Session Window by Time Overall searching 1.csv",	
+	    		+ "\\Session Window by Time Correctness searching 4.csv",	
 	    		"C:\\Users\\alexm\\OneDrive\\Documents\\ComputerScience\\EyeTrackingExp (CECS 497)\\Correct Results\\Feature Set\\Session Window FS ARFF"
-	    		+ "\\Session Window by Time Overall searching 1.arff");
+	    		+ "\\Session Window by Time Correctness searching 4.arff");
 	  }
 
 
